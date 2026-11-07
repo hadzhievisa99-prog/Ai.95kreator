@@ -5,3 +5,8 @@ dist
 
 # Ignore the output video from Git but not videos you import into src/.
 out
+
+# Medina capture intermediates (regenerate with capture/build-scene.mjs and capture/capture.mjs)
+capture/scene.html
+capture/stills
+public/shots/*.mp4

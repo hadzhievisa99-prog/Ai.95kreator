@@ -11,6 +11,22 @@
 
 Welcome to your Remotion project!
 
+## Видео «Медина Пророка ﷺ»
+
+Вертикальный ролик 1080×1920, ~55 с (композиция `Medina`, код в `src/medina/`).
+Кадры сняты прямо из 3D-реконструкции `../medina.html`; тексты и цитаты — из её карточек.
+
+Как пересобрать кадры:
+
+```console
+node capture/build-scene.mjs   # medina.html → capture/scene.html (без интерфейса)
+node capture/capture.mjs       # рендер планов → public/shots/*.mp4 (можно указать id планов)
+capture/grade.sh               # цветокоррекция + VP9 → public/shots/*.webm
+npx remotion render Medina out/medina.mp4
+```
+
+Камера каждого плана задаётся в `capture/shots.mjs`, тексты — в `src/medina/data.ts`.
+
 ## Commands
 
 **Install Dependencies**
