@@ -39,6 +39,21 @@ npx remotion render Medina out/medina.mp4
 
 `REALISM=0 node capture/capture.mjs` снимает сцену в исходном виде, как её рисует `medina.html`.
 
+## Видео «Сурака ибн Малик и путь в Медину»
+
+Вертикальный ролик 1080×1920, 2:07 (композиция `Suraqa`, код в `src/suraqa/`) — моушн-графика под озвучку ElevenLabs
+(`public/suraqa/voice.mp3`).
+
+- Сюжет — хадис из «Сахиха» аль-Бухари (глава о переселении Пророка ﷺ и его сподвижников в Медину);
+  арабские цитаты в кадре сверены по «Джами‘ аль-усуль» Ибн аль-Асира, т. 11, с. 583–588.
+- Субтитры — `src/suraqa/captions.ts`: озвучка распознана faster-whisper (small) и вычитана вручную.
+- Шрифты — Playfair Display, Manrope (Fontsource, SIL OFL) и Amiri, лежат в `public/fonts`.
+- Звуки удара, перехода и нарастания (`public/suraqa/*.m4a`) синтезированы ffmpeg; ветер — `public/audio/wind.m4a`.
+
+```console
+npx remotion render Suraqa out/suraqa.mp4 --browser-executable=/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell
+```
+
 ## Commands
 
 **Install Dependencies**
