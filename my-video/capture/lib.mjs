@@ -82,7 +82,7 @@ export async function openScene() {
 	if (REALISM) {
 		const info = await page.evaluate(
 			(o) => window.__realism({...o, sunDir: window.__SUNDIR}),
-			{width: RW, height: RH, exposure: 0.62, sunIntensity: 2.6, hemi: 0.32, turbidity: 6, rayleigh: 1.9,
+			{width: RW, height: RH, texBase: '../../medina-real/textures/', exposure: 0.62, sunIntensity: 2.6, hemi: 0.32, turbidity: 6, rayleigh: 1.9,
 				fogColor: 0xd9c2a0, fogNear: 220, fogFar: 3400},
 		);
 		console.log('realism layer:', info.materials, 'materials converted');

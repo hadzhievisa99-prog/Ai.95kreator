@@ -32,7 +32,7 @@ const libs = [
 	ex + 'postprocessing/ShaderPass.js',
 	ex + 'postprocessing/SSAOPass.js',
 	ex + 'postprocessing/UnrealBloomPass.js',
-	'realism.js',
+	'../../medina-real/realism.js',
 ];
 out = out.replace(cdn, libs.map((l) => `<script src="${l}"></script>`).join('\n'));
 

@@ -1,11 +1,11 @@
-// "Realism layer" for the film capture. Runs inside capture/scene.html only;
-// medina.html itself is never modified.
+// Realism layer for the 3D Medina. It is loaded by the realistic walk (medina-real/index.html)
+// and by the film capture (my-video/capture); medina.html itself is never modified.
 //
 // - swaps the hand-drawn canvas textures for photographic CC0 PBR textures
-//   (Poly Haven: colour + normal + roughness), see capture/textures/CREDITS.md
+//   (Poly Haven: colour + normal + roughness), see textures/CREDITS.md
 // - converts every material to physically based MeshStandardMaterial in a linear/sRGB pipeline
 // - replaces the gradient sky with an atmospheric-scattering sky that also lights the scene (IBL)
-// - adds ambient occlusion (SSAO) and a faint bloom as post-processing
+// - adds ambient occlusion (SSAO) and a faint bloom as post-processing (opts.post)
 /* global THREE */
 window.__realism = async function realism(opts) {
 	const {scene, renderer, camera, sun, sky, TX} = window.__M;
@@ -21,7 +21,7 @@ window.__realism = async function realism(opts) {
 	const loader = new THREE.TextureLoader();
 	const load = (name, srgb) =>
 		new Promise((res, rej) =>
-			loader.load(`textures/${name}.jpg`, (t) => {
+			loader.load(`${opts.texBase || 'textures/'}${name}.jpg`, (t) => {
 				t.wrapS = t.wrapT = THREE.RepeatWrapping;
 				t.anisotropy = maxAniso;
 				if (srgb) t.encoding = THREE.sRGBEncoding;
@@ -233,10 +233,15 @@ window.__realism = async function realism(opts) {
 	scene.fog.far = opts.fogFar;
 
 	// ---- post-processing: SSAO + soft bloom + sRGB out ----
+	if (opts.post === false) {
+		window.__render = null;
+		return {materials: cache.size};
+	}
 	const composer = new THREE.EffectComposer(renderer);
-	composer.setPixelRatio(1);
+	composer.setPixelRatio(opts.pixelRatio || 1);
 	composer.setSize(W, H);
-	const ssao = new THREE.SSAOPass(scene, camera, W, H);
+	const pr = opts.pixelRatio || 1;
+	const ssao = new THREE.SSAOPass(scene, camera, W * pr, H * pr);
 	ssao.kernelRadius = 0.9;
 	ssao.minDistance = 0.0006;
 	ssao.maxDistance = 0.06;
@@ -244,6 +249,10 @@ window.__realism = async function realism(opts) {
 	const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(W, H), 0.18, 0.6, 0.92);
 	composer.addPass(bloom);
 	composer.addPass(new THREE.ShaderPass(THREE.GammaCorrectionShader));
+	window.__resizePost = (w, h) => {
+		composer.setSize(w, h);
+		ssao.setSize(w * pr, h * pr);
+	};
 
 	window.__render = () => composer.render();
 	return {materials: cache.size};
