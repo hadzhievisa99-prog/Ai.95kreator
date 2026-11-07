@@ -5,7 +5,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const src = fs.readFileSync(path.join(here, '..', '..', 'medina.html'), 'utf8');
+const src = fs.readFileSync(path.join(here, '..', '..', 'medina-real', 'original.html'), 'utf8');
 
 const must = (s, find) => {
 	if (!s.includes(find)) throw new Error('Pattern not found in medina.html: ' + find);

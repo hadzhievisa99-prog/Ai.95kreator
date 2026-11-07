@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Медина Пророка ﷺ</title>
+<title>Медина Пророка ﷺ — реалистичная версия</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700&family=Alegreya+Sans:wght@400;500;700&family=Amiri:wght@400;700&display=swap">
 <style>
@@ -148,6 +148,10 @@ button:focus-visible{outline:2px solid var(--palm);outline-offset:2px}
       <li>ан-Навави, «аль-Маджму‘»; Ибн аль-Джаузи, «Мусир аль-гарам»</li>
       <li>Ибн Абд аль-Барр, «ат-Тамхид»; аль-Миззи, «Тахзиб аль-Кямаль»; аль-Байхаки, «ас-Сунан аль-кубра»</li>
     </ul>
+    <h2>Реалистичная версия</h2>
+    <ul>
+      <li>Фото-текстуры песка, гальки, глины, камня, коры пальм и дерева — Poly Haven (CC0); небо и свет рассчитаны по модели атмосферы. Постройки, размеры и тексты — как в исходной модели.</li>
+    </ul>
     <button id="go">Войти в Медину</button>
   </div>
 </div>
@@ -162,6 +166,19 @@ button:focus-visible{outline:2px solid var(--palm);outline-offset:2px}
 <div id="err" hidden>Не удалось запустить 3D. Попробуйте открыть страницу в другом браузере или обновить её.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Sky.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/math/SimplexNoise.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/SSAOShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/GammaCorrectionShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/MaskPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/SSAOPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="medina-real/realism.js"></script>
 <script>
 (function(){
 "use strict";
@@ -595,7 +612,7 @@ function buildLabels(){
   defs.forEach(([id,text,x,y,z])=>{const c=document.createElement('canvas'),g=c.getContext('2d'),fs=46,font=`700 ${fs}px "Alegreya Sans", "Segoe UI", sans-serif`;
     g.font=font;const w=Math.ceil(g.measureText(text).width)+52;c.width=w;c.height=80;g.font=font;
     g.fillStyle='rgba(30,25,19,.8)';rr(g,2,2,w-4,76,38);g.fill();g.fillStyle='#f3ead8';g.textBaseline='middle';g.fillText(text,26,43);
-    const t=new THREE.CanvasTexture(c);t.minFilter=THREE.LinearFilter;
+    const t=new THREE.CanvasTexture(c);t.minFilter=THREE.LinearFilter;t.encoding=THREE.sRGBEncoding;
     const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,fog:false,depthWrite:false,transparent:true}));s.position.set(x,y,z);s.userData={id,aspect:w/80};s.renderOrder=5;scene.add(s);labels.push(s);});
 }
 const fontWait=new Promise(res=>{setTimeout(res,2500);if(document.fonts&&document.fonts.load)Promise.all([document.fonts.load('700 46px "Alegreya Sans"')]).then(res,res);});
@@ -710,7 +727,7 @@ function drawMini(){const S=mini.width,c=S/2,Rw=miniFar?470:62,k=c/Rw;
 }
 
 /* ---------- loop ---------- */
-function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+function resize(){renderer.setSize(innerWidth,innerHeight,false);if(window.__resizePost)window.__resizePost(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);
 let last=performance.now(),frame=0;
 function tick(now){requestAnimationFrame(tick);const dt=Math.min(0.05,(now-last)/1000);last=now;frame++;
@@ -725,8 +742,14 @@ function tick(now){requestAnimationFrame(tick);const dt=Math.min(0.05,(now-last)
     s.visible=!near&&(d<900||l.id==='uhud');const h=Math.max(1.4,Math.min(70,d*0.034));s.scale.set(h*s.userData.aspect,h,1);}
   if(frame%8===0&&(started||!introOpen))setLM(landmarkAt(P.x,P.z));
   if(frame%2===0)drawMini();
-  renderer.render(scene,camera);}
+  if(window.__render)window.__render();else renderer.render(scene,camera);}
 showCardState();
-requestAnimationFrame(tick);
+	window.__M={THREE,scene,camera,renderer,sky,sun,SUN,palms,TX:{sandTex,gravelTex,pathTex,brickTex,stoneTex,plasterTex,frondMudTex,thatchTex,woodTex,trunkTex,frondTex,curtainTex,fabricTex}};
+	{const go=$('#go'),label=go.textContent;go.disabled=true;go.textContent='Загрузка текстур…';
+	 window.__realism({texBase:'medina-real/textures/',width:innerWidth,height:innerHeight,pixelRatio:renderer.getPixelRatio(),sunDir:SUN.clone(),post:!isTouch,
+	   exposure:0.58,sunIntensity:2.6,hemi:0.32,turbidity:6,rayleigh:1.9,fogColor:0xd9c2a0,fogNear:180,fogFar:2600})
+	  .catch(e=>console.error('realism layer:',e))
+	  .finally(()=>{go.disabled=false;go.textContent=label;});}
+	requestAnimationFrame(tick);
 })();
 </script>

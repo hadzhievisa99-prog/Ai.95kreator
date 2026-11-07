@@ -744,12 +744,12 @@ function tick(now){requestAnimationFrame(tick);const dt=Math.min(0.05,(now-last)
   if(frame%2===0)drawMini();
   if(window.__render)window.__render();else renderer.render(scene,camera);}
 showCardState();
-window.__M={THREE,scene,camera,renderer,sky,sun,SUN,palms,TX:{sandTex,gravelTex,pathTex,brickTex,stoneTex,plasterTex,frondMudTex,thatchTex,woodTex,trunkTex,frondTex,curtainTex,fabricTex}};
-{const go=$('#go'),label=go.textContent;go.disabled=true;go.textContent='Загрузка текстур…';
- window.__realism({width:innerWidth,height:innerHeight,pixelRatio:renderer.getPixelRatio(),sunDir:SUN.clone(),post:!isTouch,
-   exposure:0.58,sunIntensity:2.6,hemi:0.32,turbidity:6,rayleigh:1.9,fogColor:0xd9c2a0,fogNear:180,fogFar:2600})
-  .catch(e=>console.error('realism layer:',e))
-  .finally(()=>{go.disabled=false;go.textContent=label;});}
-requestAnimationFrame(tick);
+	window.__M={THREE,scene,camera,renderer,sky,sun,SUN,palms,TX:{sandTex,gravelTex,pathTex,brickTex,stoneTex,plasterTex,frondMudTex,thatchTex,woodTex,trunkTex,frondTex,curtainTex,fabricTex}};
+	{const go=$('#go'),label=go.textContent;go.disabled=true;go.textContent='Загрузка текстур…';
+	 window.__realism({texBase:'textures/',width:innerWidth,height:innerHeight,pixelRatio:renderer.getPixelRatio(),sunDir:SUN.clone(),post:!isTouch,
+	   exposure:0.58,sunIntensity:2.6,hemi:0.32,turbidity:6,rayleigh:1.9,fogColor:0xd9c2a0,fogNear:180,fogFar:2600})
+	  .catch(e=>console.error('realism layer:',e))
+	  .finally(()=>{go.disabled=false;go.textContent=label;});}
+	requestAnimationFrame(tick);
 })();
 </script>
