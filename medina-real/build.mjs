@@ -1,6 +1,6 @@
 // Builds the realistic version of the 3D walk from medina-real/original.html
 // (the original medina.html, kept unchanged) into:
-//   ../medina.html          — the page served on GitHub Pages (assets under medina-real/)
+//   ../index.html, ../medina.html — the pages served on GitHub Pages (assets under medina-real/)
 //   medina-real/index.html  — the same page with assets next to it
 // Run: node medina-real/build.mjs
 import fs from 'node:fs';
@@ -72,6 +72,8 @@ function build(prefix) {
 	return out;
 }
 
-fs.writeFileSync(path.join(here, '..', 'medina.html'), build('medina-real/'));
+const site = build('medina-real/');
+fs.writeFileSync(path.join(here, '..', 'index.html'), site); // the site's main page opens the walk
+fs.writeFileSync(path.join(here, '..', 'medina.html'), site);
 fs.writeFileSync(path.join(here, 'index.html'), build(''));
-console.log('medina.html and medina-real/index.html written');
+console.log('index.html, medina.html and medina-real/index.html written');
