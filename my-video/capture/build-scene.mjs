@@ -17,7 +17,24 @@ let out = src;
 // local three.js instead of the CDN
 const cdn = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>';
 must(out, cdn);
-out = out.replace(cdn, '<script src="../node_modules/three/build/three.min.js"></script>');
+const ex = '../node_modules/three/examples/js/';
+const libs = [
+	'../node_modules/three/build/three.min.js',
+	ex + 'objects/Sky.js',
+	ex + 'math/SimplexNoise.js',
+	ex + 'shaders/CopyShader.js',
+	ex + 'shaders/SSAOShader.js',
+	ex + 'shaders/LuminosityHighPassShader.js',
+	ex + 'shaders/GammaCorrectionShader.js',
+	ex + 'postprocessing/EffectComposer.js',
+	ex + 'postprocessing/MaskPass.js',
+	ex + 'postprocessing/RenderPass.js',
+	ex + 'postprocessing/ShaderPass.js',
+	ex + 'postprocessing/SSAOPass.js',
+	ex + 'postprocessing/UnrealBloomPass.js',
+	'realism.js',
+];
+out = out.replace(cdn, libs.map((l) => `<script src="${l}"></script>`).join('\n'));
 
 // hide every UI element; only the canvas stays
 out = out.replace(
@@ -34,7 +51,7 @@ const loopStart = 'showCardState();\nrequestAnimationFrame(tick);';
 must(out, loopStart);
 out = out.replace(
 	loopStart,
-	'window.__M={THREE,scene,camera,renderer,sky,sun,SUN,palms};window.__ready=true;',
+	'window.__M={THREE,scene,camera,renderer,sky,sun,SUN,palms,TX:{sandTex,gravelTex,pathTex,brickTex,stoneTex,plasterTex,frondMudTex,thatchTex,woodTex,trunkTex,frondTex,curtainTex,fabricTex}};window.__ready=true;',
 );
 
 fs.writeFileSync(path.join(here, 'scene.html'), out);

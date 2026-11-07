@@ -11,11 +11,17 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 export const W = 1080;
 export const H = 1920;
 
+// REALISM=0 renders the scene exactly as medina.html draws it; otherwise capture/realism.js
+// is applied. SS is the supersampling factor (frames are downscaled to W×H by ffmpeg).
+export const REALISM = process.env.REALISM !== '0';
+export const SS = Number(process.env.SS || (REALISM ? 1.5 : 1));
+
 export async function openScene() {
 	const browser = await chromium.launch({
-		args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+		args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files'],
 	});
-	const page = await browser.newPage({viewport: {width: W, height: H}, deviceScaleFactor: 1});
+	const RW = Math.round(W * SS), RH = Math.round(H * SS);
+	const page = await browser.newPage({viewport: {width: RW, height: RH}, deviceScaleFactor: 1});
 	page.on('pageerror', (e) => console.error('page error:', e.message));
 	await page.goto(pathToFileURL(path.join(here, 'scene.html')).href);
 	await page.waitForFunction(() => window.__ready === true, null, {timeout: 120000});
@@ -66,12 +72,21 @@ export async function openScene() {
 					sc.left = -extent; sc.right = extent; sc.top = extent; sc.bottom = -extent;
 					sc.near = 1; sc.far = 900; sc.updateProjectionMatrix();
 				}
-				renderer.render(scene, camera);
+				if (window.__render) window.__render();
+				else renderer.render(scene, camera);
 				return renderer.domElement.toDataURL('image/jpeg', quality || 0.93);
 			};
 		},
-		{W, H},
+		{W: RW, H: RH},
 	);
+	if (REALISM) {
+		const info = await page.evaluate(
+			(o) => window.__realism({...o, sunDir: window.__SUNDIR}),
+			{width: RW, height: RH, exposure: 0.62, sunIntensity: 2.6, hemi: 0.32, turbidity: 6, rayleigh: 1.9,
+				fogColor: 0xd9c2a0, fogNear: 220, fogFar: 3400},
+		);
+		console.log('realism layer:', info.materials, 'materials converted');
+	}
 	return {browser, page};
 }
 

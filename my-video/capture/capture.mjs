@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {openScene, renderFrame} from './lib.mjs';
+import {openScene, renderFrame, W, H, SS} from './lib.mjs';
 import {SHOTS, FPS, cameraAt} from './shots.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -34,6 +34,7 @@ for (const shot of shots) {
 	const ff = spawn('ffmpeg', [
 		'-loglevel', 'error', '-y',
 		'-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
+		...(SS !== 1 ? ['-vf', `scale=${W}:${H}:flags=lanczos`] : []),
 		'-c:v', 'libx264', '-preset', 'slow', '-crf', '15', '-pix_fmt', 'yuv420p',
 		'-movflags', '+faststart', file,
 	], {stdio: ['pipe', 'inherit', 'inherit']});
