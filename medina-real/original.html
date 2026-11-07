@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Медина Пророка ﷺ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700&family=Alegreya+Sans:wght@400;500;700&family=Amiri:wght@400;700&display=swap">
+<style>
+[hidden]{display:none !important}
+/* Layout: full-bleed walkable 3D canvas; HUD panels of dusk ink anchored to the screen corners. Single deliberate look (sunlit oasis + dark ink UI). */
+:root{
+  --ink: rgba(30,25,19,.84);
+  --ink-solid:#1e1913;
+  --paper:#f3ead8;
+  --muted:#c8b796;
+  --palm:#9cc066;
+  --date:#d39a52;
+  --line: rgba(243,234,216,.14);
+  --display:"Alegreya", Georgia, "Times New Roman", serif;
+  --body:"Alegreya Sans", "Segoe UI", Roboto, sans-serif;
+  --arabic:"Amiri", "Traditional Arabic", "Noto Naskh Arabic", serif;
+  color-scheme: dark;
+}
+html,body{height:100%}
+body{margin:0;background:#16120d;color:var(--paper);font-family:var(--body);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--palm);outline-offset:2px}
+
+.panel{background:var(--ink);border:1px solid var(--line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+
+#place{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:calc(env(safe-area-inset-left,0px) + 12px);padding:8px 12px;border-radius:10px;max-width:calc(100% - 190px);pointer-events:none}
+#place small{display:block;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--palm)}
+#place b{font-family:var(--display);font-weight:700;font-size:1.02rem;line-height:1.2;display:block;text-wrap:balance}
+
+#side{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:calc(env(safe-area-inset-right,0px) + 12px);display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+#mini{width:136px;height:136px;border-radius:50%;display:block;border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
+#miniHint{font-size:.68rem;color:var(--muted);text-align:center;width:136px;margin-top:-4px}
+.btnrow{display:flex;gap:8px}
+.hbtn{min-height:44px;min-width:44px;padding:0 14px;border-radius:22px;font-weight:500;font-size:.95rem}
+.hbtn:hover{border-color:rgba(243,234,216,.35)}
+
+#card{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:min(580px, calc(100% - 24px));box-sizing:border-box;border-radius:14px;padding:14px 16px 12px;max-height:52vh;overflow:auto;-webkit-user-select:text;user-select:text}
+#card .top{display:flex;align-items:flex-start;gap:10px}
+#card .top>div{flex:1;min-width:0}
+#cCat{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--palm);margin:0}
+#cTitle{font-family:var(--display);font-weight:700;font-size:1.32rem;line-height:1.15;margin:2px 0 6px;text-wrap:balance}
+#cLead{margin:0;font-size:.98rem;line-height:1.45;color:var(--paper)}
+#cMore p{margin:10px 0 0;font-size:.95rem;line-height:1.5;color:#e4d8bf}
+#cQuote{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:rgba(243,234,216,.06);border-right:3px solid var(--date)}
+#cQuote q{display:block;font-family:var(--arabic);font-size:1.32rem;line-height:1.7;direction:rtl;text-align:right;quotes:"«" "»";color:#f6e6c2}
+#cQuote cite{display:block;font-style:normal;font-size:.8rem;line-height:1.4;color:var(--muted);margin-top:6px}
+.cbtns{display:flex;gap:6px;flex-shrink:0}
+.ibtn{width:40px;height:40px;border-radius:20px;border:1px solid var(--line);background:transparent;font-size:1.05rem;line-height:1;display:grid;place-items:center}
+#cToggle{margin-top:8px;background:none;border:0;padding:6px 0;color:var(--date);font-weight:700;font-size:.92rem;min-height:36px}
+#reopen{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);min-height:44px;padding:0 16px;border-radius:22px}
+
+#joy{position:fixed;width:112px;height:112px;margin:-56px 0 0 -56px;border-radius:50%;border:2px solid rgba(243,234,216,.45);background:rgba(30,25,19,.25);pointer-events:none}
+#knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(243,234,216,.75)}
+#hint{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 76px);transform:translateX(-50%);padding:8px 14px;border-radius:10px;font-size:.88rem;color:var(--paper);pointer-events:none;transition:opacity .6s;text-align:center;max-width:calc(100% - 32px);box-sizing:border-box}
+#keys{position:fixed;left:calc(env(safe-area-inset-left,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);font-size:.78rem;color:var(--muted);padding:6px 10px;border-radius:8px;line-height:1.5;pointer-events:none}
+@media (max-width:1100px){#keys{display:none}}
+
+.overlay{position:fixed;inset:0;display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 16px) max(16px, env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px, env(safe-area-inset-left,0px));background:linear-gradient(180deg, rgba(22,18,13,.35), rgba(22,18,13,.78));overflow:auto;box-sizing:border-box}
+.sheet{width:min(620px,100%);border-radius:18px;padding:22px 22px 20px;box-sizing:border-box;-webkit-user-select:text;user-select:text}
+#intro h1{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,6vw,2.6rem);line-height:1.05;margin:0;text-wrap:balance}
+#intro .ar{font-family:var(--arabic);font-size:1.25rem;color:var(--date);margin:2px 0 0;direction:rtl;text-align:left}
+#intro .sub{color:var(--muted);margin:8px 0 14px;font-size:1rem;line-height:1.45}
+#intro p{line-height:1.55;margin:0 0 10px;font-size:.98rem}
+#intro h2{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--palm);margin:16px 0 6px;font-weight:700}
+#intro ul{margin:0;padding-left:18px;line-height:1.55;font-size:.93rem;color:#e4d8bf}
+#intro li{margin:2px 0}
+.ctrl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.93rem;line-height:1.45}
+.ctrl span:nth-child(odd){color:var(--date);font-weight:700;white-space:nowrap}
+#go{margin-top:18px;width:100%;min-height:52px;border-radius:14px;border:0;background:var(--palm);color:#1c2410;font-weight:700;font-size:1.08rem;letter-spacing:.01em}
+#go:hover{filter:brightness(1.07)}
+
+#places .sheet{max-height:100%;overflow:auto}
+#places h3{font-family:var(--display);font-size:1.4rem;margin:0}
+.phead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+.pgroup{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--palm);margin:14px 0 6px;font-weight:700}
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.pitem{text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(243,234,216,.04);min-height:44px;font-size:.96rem;line-height:1.25}
+.pitem:hover{background:rgba(243,234,216,.1)}
+.pitem.on{border-color:var(--palm)}
+#err{position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center;font-size:1.05rem;line-height:1.5}
+@media (prefers-reduced-motion: reduce){#hint{transition:none}}
+</style>
+
+<canvas id="c" tabindex="0" aria-label="Трёхмерная модель Медины"></canvas>
+
+<div id="place" class="panel"><small>Вы здесь</small><b id="placeName">Медина</b></div>
+
+<div id="side">
+  <canvas id="mini" width="272" height="272" aria-label="Мини-карта, нажмите для смены масштаба"></canvas>
+  <div id="miniHint">нажмите — масштаб</div>
+  <div class="btnrow">
+    <button class="hbtn panel" id="btnPlaces">Места</button>
+    <button class="hbtn panel" id="btnInfo" aria-label="О модели">?</button>
+  </div>
+</div>
+
+<section id="card" class="panel" aria-live="polite">
+  <div class="top">
+    <div>
+      <p id="cCat"></p>
+      <h2 id="cTitle"></h2>
+    </div>
+    <div class="cbtns"><button class="ibtn" id="cClose" aria-label="Скрыть описание">✕</button></div>
+  </div>
+  <p id="cLead"></p>
+  <div id="cMore" hidden>
+    <div id="cParas"></div>
+    <blockquote id="cQuote" hidden><q id="cQ"></q><cite id="cSrc"></cite></blockquote>
+  </div>
+  <button id="cToggle">Подробнее ▾</button>
+</section>
+<button id="reopen" class="panel" hidden>Описание места</button>
+
+<div id="joy" hidden><div id="knob"></div></div>
+<div id="hint" class="panel" hidden></div>
+<div id="keys" class="panel">W A S D — идти · мышь (зажать) — смотреть · Shift — быстрее</div>
+
+<div id="intro" class="overlay">
+  <div class="sheet panel">
+    <h1>Медина Пророка ﷺ</h1>
+    <p class="ar">المدينة المنورة</p>
+    <p class="sub">Прогулка по городу примерно 2–6 годов хиджры: после смены киблы и до расширения мечети после Хайбара.</p>
+    <p>Мечеть, комнаты матерей правоверных, минбар, ар-Рауда, рынок, сад Бир Ха, аль-Баки‘, ров Хандак, Куба и Ухуд на горизонте. Подойдите к месту, и снизу появится описание с текстом из первоисточника.</p>
+    <h2>Как ходить</h2>
+    <div class="ctrl">
+      <span>Телефон</span><span>левая часть экрана — джойстик, правая — повернуть взгляд; сильнее отклоните джойстик, чтобы идти быстрее</span>
+      <span>Компьютер</span><span>W A S D или стрелки, мышь с зажатой кнопкой — смотреть, Shift — быстрее</span>
+      <span>«Места»</span><span>мгновенный переход к любому месту</span>
+    </div>
+    <h2>Важно</h2>
+    <ul>
+      <li>Людей в модели нет: Пророка ﷺ и сподвижников не изображают.</li>
+      <li>Размеры мечети взяты из источников (70 × 60 локтей). Расстояния до Кубы, Ухуда, рынка и аль-Баки‘ сжаты, чтобы всё можно было обойти.</li>
+      <li>Это реконструкция по описаниям: точное расположение многих домов и улиц неизвестно.</li>
+    </ul>
+    <h2>Источники (аль-Мактаба аш-Шамиля)</h2>
+    <ul>
+      <li>Ибн Са‘д, «ат-Табакат аль-кубра»</li>
+      <li>Ибн ан-Наджжар, «ад-Дурра ас-самина фи ахбар аль-Мадина»</li>
+      <li>ас-Самхуди, «Вафа аль-вафа би ахбар дар аль-Мустафа»</li>
+      <li>ан-Навави, «аль-Маджму‘»; Ибн аль-Джаузи, «Мусир аль-гарам»</li>
+      <li>Ибн Абд аль-Барр, «ат-Тамхид»; аль-Миззи, «Тахзиб аль-Кямаль»; аль-Байхаки, «ас-Сунан аль-кубра»</li>
+    </ul>
+    <button id="go">Войти в Медину</button>
+  </div>
+</div>
+
+<div id="places" class="overlay" hidden>
+  <div class="sheet panel">
+    <div class="phead"><h3>Места</h3><button class="ibtn" id="pClose" aria-label="Закрыть">✕</button></div>
+    <div id="pBody"></div>
+  </div>
+</div>
+
+<div id="err" hidden>Не удалось запустить 3D. Попробуйте открыть страницу в другом браузере или обновить её.</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+function fail(){ $('#err').hidden=false; $('#intro').hidden=true; }
+if(!window.THREE){ fail(); return; }
+
+const canvas=$('#c');
+const isTouch = (window.matchMedia && matchMedia('(pointer: coarse)').matches) || ('ontouchstart' in window);
+let renderer;
+try{
+  renderer=new THREE.WebGLRenderer({canvas,antialias:!isTouch,powerPreference:'high-performance'});
+}catch(e){ fail(); return; }
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, isTouch?1.6:2));
+renderer.setSize(innerWidth,innerHeight,false);
+const SHADOWS=!isTouch;
+renderer.shadowMap.enabled=SHADOWS;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+const scene=new THREE.Scene();
+const HORIZON=0xe9d5ad;
+scene.fog=new THREE.Fog(HORIZON,140,1750);
+const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.1,4500);
+camera.rotation.order='YXZ';
+
+/* ---------- helpers ---------- */
+let seed=1447;
+function rnd(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}
+const R=(a,b)=>a+rnd()*(b-a);
+function hash(x,z){const s=Math.sin(x*127.1+z*311.7)*43758.5453;return s-Math.floor(s);}
+function vnoise(x,z){const xi=Math.floor(x),zi=Math.floor(z),xf=x-xi,zf=z-zi;const u=xf*xf*(3-2*xf),v=zf*zf*(3-2*zf);
+  const a=hash(xi,zi),b=hash(xi+1,zi),c=hash(xi,zi+1),d=hash(xi+1,zi+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v;}
+const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
+const yawTo=(x,z,tx,tz)=>Math.atan2(-(tx-x),-(tz-z));
+
+function tex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');draw(g,w,h);
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());return t;}
+function specks(g,w,h,n,cols,smin,smax,alpha){g.globalAlpha=alpha;for(let i=0;i<n;i++){g.fillStyle=cols[(rnd()*cols.length)|0];const s=R(smin,smax);g.fillRect(rnd()*w,rnd()*h,s,s);}g.globalAlpha=1;}
+function blotches(g,w,h,n,cols,rmin,rmax,alpha){for(let i=0;i<n;i++){const x=rnd()*w,y=rnd()*h,r=R(rmin,rmax);const gr=g.createRadialGradient(x,y,0,x,y,r);const c=cols[(rnd()*cols.length)|0];gr.addColorStop(0,c);gr.addColorStop(1,'rgba(0,0,0,0)');g.globalAlpha=alpha;g.fillStyle=gr;g.fillRect(x-r,y-r,2*r,2*r);}g.globalAlpha=1;}
+
+/* ---------- textures ---------- */
+const sandTex=tex(256,256,(g,w,h)=>{g.fillStyle='#dcc394';g.fillRect(0,0,w,h);blotches(g,w,h,40,['#e8d3a8','#cdb07e'],20,60,.35);specks(g,w,h,6000,['#cfb383','#e6cfa3','#c4a473','#ecdcb9','#b8996a'],1,2.2,.55);});
+const gravelTex=tex(256,256,(g,w,h)=>{g.fillStyle='#ccb489';g.fillRect(0,0,w,h);for(let i=0;i<2200;i++){g.fillStyle=['#a99474','#bfa983','#8f7c62','#d8c6a2','#9b8a72'][(rnd()*5)|0];g.beginPath();g.ellipse(rnd()*w,rnd()*h,R(1.2,3.6),R(1,3),rnd()*3,0,7);g.fill();}});
+const pathTex=tex(256,256,(g,w,h)=>{g.fillStyle='#e2cda3';g.fillRect(0,0,w,h);blotches(g,w,h,30,['#ecdcbc','#d3ba8d'],20,50,.4);specks(g,w,h,3000,['#d6c096','#efe0c2','#c9ae80'],1,2,.5);});
+const brickTex=tex(256,256,(g,w,h)=>{g.fillStyle='#9a754b';g.fillRect(0,0,w,h);const rows=8,bh=h/rows,bw=64;
+  for(let r=0;r<rows;r++){const off=(r%2)*bw/2;for(let x=-bw;x<w+bw;x+=bw){const l=R(50,60),hu=R(26,34),s=R(36,48);g.fillStyle=`hsl(${hu},${s}%,${l}%)`;g.fillRect(x+off+3,r*bh+3,bw-6,bh-6);}}
+  specks(g,w,h,2500,['#7d5d3b','#c9a174','#b48a5e'],1,2.5,.4);blotches(g,w,h,14,['#6e5235','#d2ac80'],15,40,.18);});
+const stoneTex=tex(256,256,(g,w,h)=>{g.fillStyle='#51463b';g.fillRect(0,0,w,h);const cs=['#8f806c','#9c8b74','#7d6f5e','#a69680','#887764'];
+  for(let y=0;y<h;y+=42){for(let x=-20;x<w+20;x+=R(40,64)){g.fillStyle=cs[(rnd()*cs.length)|0];g.beginPath();const ww=R(34,58),hh=R(32,40);
+    g.moveTo(x+R(2,6),y+R(2,6));g.lineTo(x+ww-R(2,6),y+R(2,5));g.lineTo(x+ww-R(1,4),y+hh-R(2,6));g.lineTo(x+R(1,5),y+hh-R(1,4));g.closePath();g.fill();}}
+  specks(g,w,h,2000,['#6b5e50','#b3a48d'],1,2.5,.35);});
+const plasterTex=tex(256,256,(g,w,h)=>{g.fillStyle='#c79c69';g.fillRect(0,0,w,h);blotches(g,w,h,50,['#d8b285','#ad845a','#c09366'],18,60,.35);specks(g,w,h,2500,['#a98058','#dcbc94'],1,2,.4);});
+const frondMudTex=tex(256,256,(g,w,h)=>{g.fillStyle='#b88d5c';g.fillRect(0,0,w,h);g.strokeStyle='#7f5f3c';
+  for(let x=4;x<w;x+=R(7,12)){g.globalAlpha=R(.25,.55);g.lineWidth=R(1.5,3);g.beginPath();g.moveTo(x,0);for(let y=0;y<=h;y+=16)g.lineTo(x+Math.sin(y*0.05+x)*1.5,y);g.stroke();}
+  g.globalAlpha=1;blotches(g,w,h,40,['#d1a97a','#9e7650'],15,50,.4);specks(g,w,h,1500,['#a07650','#d8b890'],1,2,.4);});
+const thatchTex=tex(256,256,(g,w,h)=>{g.fillStyle='#8f7647';g.fillRect(0,0,w,h);const cs=['#b49a62','#7d6638','#c4ab70','#a28a55','#6c5932'];
+  for(let i=0;i<900;i++){g.strokeStyle=cs[(rnd()*cs.length)|0];g.lineWidth=R(1.5,3.5);const x=rnd()*w,y=rnd()*h,a=R(-0.35,0.35)+Math.PI/2,L=R(20,60);g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*L,y+Math.sin(a)*L);g.stroke();}});
+const curtainTex=tex(128,128,(g,w,h)=>{g.fillStyle='#24201c';g.fillRect(0,0,w,h);for(let x=0;x<w;x+=1.5){g.strokeStyle=rnd()<.5?'#3a332c':'#15120f';g.globalAlpha=R(.3,.8);g.beginPath();g.moveTo(x,0);g.lineTo(x+R(-2,2),h);g.stroke();}g.globalAlpha=1;});
+const woodTex=tex(128,256,(g,w,h)=>{g.fillStyle='#8a5b35';g.fillRect(0,0,w,h);for(let x=0;x<w;x+=R(3,7)){g.strokeStyle=rnd()<.5?'#6d4526':'#a06d44';g.globalAlpha=R(.3,.7);g.lineWidth=R(1,2.5);g.beginPath();g.moveTo(x,0);for(let y=0;y<=h;y+=20)g.lineTo(x+Math.sin(y*0.03+x*0.2)*3,y);g.stroke();}g.globalAlpha=1;});
+const trunkTex=tex(64,128,(g,w,h)=>{g.fillStyle='#7a5f43';g.fillRect(0,0,w,h);g.strokeStyle='#4f3c29';g.lineWidth=3;
+  for(let y=0;y<h+16;y+=16){for(let x=-16;x<w+16;x+=16){g.beginPath();g.moveTo(x,y);g.lineTo(x+8,y-8);g.lineTo(x+16,y);g.stroke();}}specks(g,w,h,400,['#957452','#5d4632'],1,2,.5);});
+const frondTex=tex(64,256,(g,w,h)=>{g.clearRect(0,0,w,h);const cs=['#6f9440','#86a84f','#5f8235','#7a9b46'];
+  for(let y=6;y<h-4;y+=4){const k=Math.sin(Math.PI*y/h);for(const s of[-1,1]){g.strokeStyle=cs[(rnd()*cs.length)|0];g.lineWidth=2.4;g.beginPath();g.moveTo(w/2,y);g.lineTo(w/2+s*(w/2-2)*k,y-10*k);g.stroke();}}
+  g.strokeStyle='#4e6a2a';g.lineWidth=3;g.beginPath();g.moveTo(w/2,0);g.lineTo(w/2,h);g.stroke();});
+const fabricTex=tex(128,128,(g,w,h)=>{g.fillStyle='#e3d6bc';g.fillRect(0,0,w,h);for(let x=0;x<w;x+=32){g.fillStyle='#8c3f2c';g.fillRect(x,0,10,h);g.fillStyle='#2f4b62';g.fillRect(x+14,0,4,h);}specks(g,w,h,800,['#cbbd9f','#f0e6d0'],1,2,.4);});
+sandTex.repeat.set(260,260);
+
+/* ---------- materials ---------- */
+const L=o=>new THREE.MeshLambertMaterial(o);
+const brickMat=L({map:brickTex}), stoneMat=L({map:stoneTex}), plasterMat=L({map:plasterTex}), frondMudMat=L({map:frondMudTex});
+const thatchMat=L({map:thatchTex,side:THREE.DoubleSide}), woodMat=L({map:woodTex}), curtainMat=L({map:curtainTex,side:THREE.DoubleSide});
+const trunkMat=L({map:trunkTex}), frondMat=L({map:frondTex,side:THREE.DoubleSide,alphaTest:0.45});
+const gravelMat=L({map:gravelTex,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});
+const pathMat=L({map:pathTex,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1});
+const doorMat=L({color:0x4a3524}), fabricMat=L({map:fabricTex,side:THREE.DoubleSide});
+
+/* ---------- sky & light ---------- */
+{
+  const g=new THREE.SphereGeometry(3400,32,16),pos=g.attributes.position,cols=[];
+  const top=new THREE.Color(0x5b93cc),hor=new THREE.Color(HORIZON),c=new THREE.Color();
+  for(let i=0;i<pos.count;i++){const y=pos.getY(i)/3400;c.copy(hor).lerp(top,Math.pow(Math.max(0,y),0.5));cols.push(c.r,c.g,c.b);}
+  g.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
+  var sky=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.BackSide,fog:false,depthWrite:false}));
+  sky.renderOrder=-1;scene.add(sky);
+}
+scene.add(new THREE.HemisphereLight(0xd3e5f5,0xb38b5c,0.62));
+const sun=new THREE.DirectionalLight(0xfff0d4,0.98);
+const SUN=new THREE.Vector3(-0.55,0.78,0.36).normalize();
+sun.castShadow=SHADOWS;
+if(SHADOWS){sun.shadow.mapSize.set(2048,2048);const sc=sun.shadow.camera;sc.left=-55;sc.right=55;sc.top=55;sc.bottom=-55;sc.near=1;sc.far=300;sun.shadow.bias=-0.0006;sun.shadow.normalBias=0.03;}
+scene.add(sun);scene.add(sun.target);
+
+/* ---------- world building helpers ---------- */
+const colliders=[]; // boxes {x0,x1,z0,z1} or circles {x,z,r}
+function uvBox(w,h,d,s){const g=new THREE.BoxGeometry(w,h,d);const uv=g.attributes.uv;const dims=[[d,h],[d,h],[w,d],[w,d],[w,h],[w,h]];
+  for(let f=0;f<6;f++)for(let i=0;i<4;i++){const k=f*4+i;uv.setXY(k,uv.getX(k)*dims[f][0]/s,uv.getY(k)*dims[f][1]/s);}return g;}
+function block(x,y0,z,w,h,d,mat,s,solid){const m=new THREE.Mesh(uvBox(w,h,d,s||2),mat);m.position.set(x,y0+h/2,z);m.castShadow=m.receiveShadow=SHADOWS;scene.add(m);
+  if(solid!==false)colliders.push({x0:x-w/2,x1:x+w/2,z0:z-d/2,z1:z+d/2});return m;}
+function splitGaps(a,b,gaps){const segs=[];let cur=a;gaps.slice().sort((p,q)=>p[0]-q[0]).forEach(g=>{if(g[0]>cur)segs.push([cur,g[0]]);cur=Math.max(cur,g[1]);});if(cur<b)segs.push([cur,b]);return segs;}
+// wall running along `axis` ('x' = along x at z=fixed; 'z' = along z at x=fixed)
+function wallRun(axis,fixed,a,b,gaps,H,T){H=H||3.0;T=T||0.7;
+  for(const [s,e] of splitGaps(a,b,gaps)){const Lg=e-s,c=(s+e)/2;
+    if(axis==='x'){block(c,0,fixed,Lg,0.9,T+0.1,stoneMat,1.2);block(c,0.9,fixed,Lg,H-0.9,T,brickMat,1.6);}
+    else{block(fixed,0,c,T+0.1,0.9,Lg,stoneMat,1.2);block(fixed,0.9,c,T,H-0.9,Lg,brickMat,1.6);}}
+  for(const g of gaps){const Lg=g[1]-g[0],c=(g[0]+g[1])/2;
+    if(axis==='x'){block(c,2.3,fixed,Lg,H-2.3,T,brickMat,1.6,false);block(c,2.2,fixed,Lg+0.5,0.12,T+0.16,woodMat,1,false);}
+    else{block(fixed,2.3,c,T,H-2.3,Lg,brickMat,1.6,false);block(fixed,2.2,c,T+0.16,0.12,Lg+0.5,woodMat,1,false);}}}
+function lowWall(axis,fixed,a,b,gaps,H){for(const [s,e] of splitGaps(a,b,gaps)){const Lg=e-s,c=(s+e)/2;
+  if(axis==='x')block(c,0,fixed,Lg,H,0.6,stoneMat,1.2);else block(fixed,0,c,0.6,H,Lg,stoneMat,1.2);}}
+function pillar(x,z,h){const m=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.25,h,9),trunkMat);m.position.set(x,h/2,z);m.castShadow=m.receiveShadow=SHADOWS;
+  m.material.map.repeat&&0;scene.add(m);colliders.push({x,z,r:0.26});}
+function flat(w,d,mat,x,z,y,rep){const g=new THREE.PlaneGeometry(w,d);g.rotateX(-Math.PI/2);if(rep){const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*w/rep,uv.getY(i)*d/rep);}
+  const m=new THREE.Mesh(g,mat);m.position.set(x,y,z);m.receiveShadow=SHADOWS;scene.add(m);return m;}
+
+/* ---------- ground ---------- */
+const harraF=(x,z)=>smooth(0,1,(Math.abs(x)+ (vnoise(x*0.012,z*0.012)-0.5)*90 - 215)/40);
+{
+  const G=2800,seg=140,g=new THREE.PlaneGeometry(G,G,seg,seg);g.rotateX(-Math.PI/2);
+  const p=g.attributes.position,cols=[];
+  for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i);const n=0.9+0.16*vnoise(x*0.05,z*0.05);const hf=harraF(x,z);
+    cols.push(n*(1-hf)+0.32*hf, n*0.985*(1-hf)+0.29*hf, n*0.95*(1-hf)+0.27*hf);}
+  g.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
+  const ground=new THREE.Mesh(g,L({map:sandTex,vertexColors:true}));ground.receiveShadow=SHADOWS;scene.add(ground);
+}
+
+/* ---------- roads ---------- */
+const roads=[];
+function road(x0,z0,x1,z1,w){const dx=x1-x0,dz=z1-z0,len=Math.hypot(dx,dz);const g=new THREE.PlaneGeometry(w,len);g.rotateX(-Math.PI/2);
+  const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*w/8,uv.getY(i)*len/8);
+  const m=new THREE.Mesh(g,pathMat);m.position.set((x0+x1)/2,0.015,(z0+z1)/2);m.rotation.y=Math.atan2(dx,dz);m.receiveShadow=SHADOWS;scene.add(m);roads.push([x0,z0,x1,z1,w]);}
+road(-16,3.1,-100,14,6); road(16,2.3,112,28,6);
+road(0,24,30,200,6); road(30,200,70,384,6);
+road(0,-20,6,-250,6); road(6,-250,0,-430,6);
+road(-100,14,-96,120,5); road(112,28,150,-120,5); road(-60,7,-150,-180,5);
+flat(92,92,pathMat,0,0,0.012,8); // open square around the mosque
+
+function segDist(x,z,x0,z0,x1,z1){const dx=x1-x0,dz=z1-z0;const t=Math.max(0,Math.min(1,((x-x0)*dx+(z-z0)*dz)/(dx*dx+dz*dz)));return Math.hypot(x-(x0+t*dx),z-(z0+t*dz));}
+
+/* ---------- THE MOSQUE ---------- */
+// 1 m ≈ 2 cubits. 70×60 cubits ≈ 35 m (north–south, along the qibla axis) × 30 m. North = −z, qibla (south, to the Kaaba) = +z.
+const MX=15, MZ=17.5;
+const eastRooms=[{z:15,len:4.6,kind:'brick',aisha:true},{z:10.2,len:4.4,kind:'frond'},{z:-1.5,len:4.4,kind:'brick'},{z:-6.2,len:4.4,kind:'frond'},{z:-10.9,len:4.4,kind:'brick'},{z:-15.4,len:4.2,kind:'frond'}];
+const southRooms=[{x:4.3,kind:'frond'},{x:9.0,kind:'brick'}];
+const neRoom={x:11,kind:'frond'};
+wallRun('x',-MZ,-MX-0.35,MX+0.35,[[-1.1,1.1],[neRoom.x-0.5,neRoom.x+0.5]]);                 // north (rear)
+wallRun('x', MZ,-MX-0.35,MX+0.35,southRooms.map(r=>[r.x-0.5,r.x+0.5]));                     // south (qibla)
+wallRun('z',-MX,-MZ+0.35,MZ-0.35,[[2,4.2]]);                                              // west — Bab ar-Rahma
+wallRun('z', MX,-MZ+0.35,MZ-0.35,[[1.2,3.4]].concat(eastRooms.map(r=>[r.z-0.5,r.z+0.5]))); // east — Bab ‘Uthman + rooms
+flat(2*MX-0.7,2*MZ-0.7,gravelMat,0,0,0.03,3);
+
+// curtains (black hair-cloth) in room doorways + blocking collider
+function curtain(x,z,rotY){const m=new THREE.Mesh(new THREE.PlaneGeometry(1.02,2.18),curtainMat);m.position.set(x,1.1,z);m.rotation.y=rotY;scene.add(m);
+  if(rotY)colliders.push({x0:x-0.35,x1:x+0.35,z0:z-0.5,z1:z+0.5});else colliders.push({x0:x-0.5,x1:x+0.5,z0:z-0.35,z1:z+0.35});}
+eastRooms.forEach(r=>curtain(MX,r.z,Math.PI/2));
+southRooms.forEach(r=>curtain(r.x,MZ,0));
+curtain(neRoom.x,-MZ,0);
+
+// rooms of the Mothers of the Believers
+function room(cx,cz,w,d,kind,out){const H=2.65;block(cx,0,cz,w,H,d,kind==='brick'?brickMat:frondMudMat,1.6);
+  block(cx,H,cz,w+0.4,0.18,d+0.4,thatchMat,2,false);
+  if(kind==='brick'){ // small yard fenced with palm branches on the outer side
+    const fd=2.6,fh=1.9,t=0.14;
+    if(out==='x'){const x0=cx+w/2,x1=x0+fd;block((x0+x1)/2,0,cz-d/2+t/2,fd,fh,t,thatchMat,1.5);block((x0+x1)/2,0,cz+d/2-t/2,fd,fh,t,thatchMat,1.5);block(x1,0,cz,t,fh,d,thatchMat,1.5);}
+    if(out==='z'){const z0=cz+d/2,z1=z0+fd;block(cx-w/2+t/2,0,(z0+z1)/2,t,fh,fd,thatchMat,1.5);block(cx+w/2-t/2,0,(z0+z1)/2,t,fh,fd,thatchMat,1.5);block(cx,0,z1,w,fh,t,thatchMat,1.5);}
+    if(out==='-z'){const z1=cz-d/2,z0=z1-fd;block(cx-w/2+t/2,0,(z0+z1)/2,t,fh,fd,thatchMat,1.5);block(cx+w/2-t/2,0,(z0+z1)/2,t,fh,fd,thatchMat,1.5);block(cx,0,z0,w,fh,t,thatchMat,1.5);}
+  }}
+eastRooms.forEach(r=>room(MX+0.35+2.2,r.z,4.4,r.len,r.kind,'x'));
+southRooms.forEach(r=>room(r.x,MZ+0.35+2.1,4.4,4.2,r.kind,'z'));
+room(neRoom.x,-MZ-0.35-2.1,4.4,4.2,neRoom.kind,'-z');
+
+// roofed prayer hall at the qibla (zulla): palm-trunk columns, palm-frond roof
+{
+  const z0=10.4,z1=MZ-0.35;block(0,2.86,(z0+z1)/2,2*MX-0.7,0.2,z1-z0,thatchMat,2,false);
+  [-12,-8,-4,0,4,8,12].forEach(x=>{[10.8,13.95].forEach(z=>pillar(x,z,2.86));});
+  [10.8,13.95,16.9].forEach(z=>block(0,2.68,z,2*MX-0.7,0.16,0.18,woodMat,1,false));
+  if(!SHADOWS)flat(2*MX-0.7,z1-z0,new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.22,depthWrite:false}),0,(z0+z1)/2,0.045);
+}
+// as-Suffa — roofed shelter at the rear (north)
+{
+  const x0=-MX+0.35,x1=-2,z0=-MZ+0.35,z1=-12.5;block((x0+x1)/2,2.86,(z0+z1)/2,x1-x0,0.2,z1-z0,thatchMat,2,false);
+  [-12,-8,-4,-2.3].forEach(x=>pillar(x,-12.8,2.86));
+  block((x0+x1)/2,2.68,-12.8,x1-x0,0.16,0.18,woodMat,1,false);
+  if(!SHADOWS)flat(x1-x0,z1-z0,new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.22,depthWrite:false}),(x0+x1)/2,(z0+z1)/2,0.045);
+}
+// the minbar of tamarisk: two steps and a seat, against the qibla wall
+{
+  const mx=-4.2;
+  block(mx,0,16.75,0.9,0.95,0.8,woodMat,0.6);
+  block(mx,0,15.95,0.9,0.63,0.8,woodMat,0.6);
+  block(mx,0,15.2,0.9,0.31,0.7,woodMat,0.6);
+  block(mx,0.95,17.08,0.9,0.62,0.1,woodMat,0.6,false);
+  block(mx-0.47,0,16.05,0.06,1.3,2.2,woodMat,0.6,false);block(mx+0.47,0,16.05,0.06,1.3,2.2,woodMat,0.6,false);
+}
+// ar-Rawda marker (between the minbar and the door of ‘A’isha’s room)
+{
+  const m=flat(14.6-(-3.6),17.1-12.0,new THREE.MeshBasicMaterial({color:0x7fb55a,transparent:true,opacity:0.16,depthWrite:false}),(14.6-3.6)/2,(12+17.1)/2,0.05);
+  m.renderOrder=2;
+}
+
+/* ---------- Quba mosque ---------- */
+{
+  const cx=70,cz=400,h=10;
+  wallRun('x',cz-h,cx-h-0.35,cx+h+0.35,[[cx-1,cx+1]],2.8);
+  wallRun('x',cz+h,cx-h-0.35,cx+h+0.35,[],2.8);
+  wallRun('z',cx-h,cz-h+0.35,cz+h-0.35,[[cz-1,cz+1]],2.8);
+  wallRun('z',cx+h,cz-h+0.35,cz+h-0.35,[[cz-1,cz+1]],2.8);
+  flat(2*h-0.7,2*h-0.7,gravelMat,cx,cz,0.03,3);
+  block(cx,2.66,cz+h-2.6,2*h-0.7,0.2,4.5,thatchMat,2,false);
+  [-6,-2,2,6].forEach(dx=>pillar(cx+dx,cz+h-4.6,2.66));
+}
+
+/* ---------- the market ---------- */
+const MK={x:-115,z:15};
+{
+  const dome=new THREE.Mesh(new THREE.SphereGeometry(4.5,28,12,0,Math.PI*2,0,Math.PI/2),fabricMat);dome.position.set(MK.x,0,MK.z);dome.scale.y=0.75;dome.castShadow=SHADOWS;scene.add(dome);
+  colliders.push({x:MK.x,z:MK.z,r:4.4});
+  const basketMat=L({color:0xa7834f}),dateMat=L({color:0x5a2e1a}),barleyMat=L({color:0xd8bd7a});
+  for(let i=0;i<12;i++){const a=i/12*Math.PI*2+0.2,rr=i%2?15:22,x=MK.x+Math.cos(a)*rr,z=MK.z+Math.sin(a)*rr;
+    const awn=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.06,2.6),fabricMat);awn.position.set(x,2.25,z);awn.rotation.y=-a;awn.rotation.x=0.12;awn.castShadow=SHADOWS;scene.add(awn);
+    for(const [ox,oz] of [[-1.4,-1.1],[1.4,-1.1],[-1.4,1.1],[1.4,1.1]]){const ca=Math.cos(-a),sa=Math.sin(-a);const px=x+ox*ca+oz*sa,pz=z-ox*sa+oz*ca;
+      const p=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.06,2.3,5),woodMat);p.position.set(px,1.15,pz);scene.add(p);}
+    for(let k=0;k<3;k++){const ox=(k-1)*0.9;const px=x+ox*Math.cos(-a),pz=z-ox*Math.sin(-a);
+      const b=new THREE.Mesh(new THREE.CylinderGeometry(0.38,0.3,0.42,10),basketMat);b.position.set(px,0.21,pz);b.castShadow=SHADOWS;scene.add(b);
+      const pile=new THREE.Mesh(new THREE.SphereGeometry(0.34,10,6,0,Math.PI*2,0,Math.PI/2),(i+k)%3?dateMat:barleyMat);pile.position.set(px,0.42,pz);scene.add(pile);}
+    colliders.push({x,z,r:1.4});}
+}
+
+/* ---------- Bi'r Ha garden of Abu Talha ---------- */
+const BH={x0:10,x1:50,z0:-88,z1:-54};
+{
+  lowWall('x',BH.z1,BH.x0,BH.x1,[[28,32]],1.4);lowWall('x',BH.z0,BH.x0,BH.x1,[],1.4);
+  lowWall('z',BH.x0,BH.z0,BH.z1,[],1.4);lowWall('z',BH.x1,BH.z0,BH.z1,[],1.4);
+  const wx=34,wz=-64;
+  const ring=new THREE.Mesh(new THREE.CylinderGeometry(1.15,1.25,0.85,16,1,true),stoneMat);ring.position.set(wx,0.42,wz);ring.material.side=THREE.DoubleSide;ring.castShadow=SHADOWS;scene.add(ring);
+  const water=new THREE.Mesh(new THREE.CircleGeometry(1.1,16),new THREE.MeshLambertMaterial({color:0x2b4a52}));water.rotation.x=-Math.PI/2;water.position.set(wx,0.25,wz);scene.add(water);
+  block(wx-1.3,0,wz,0.18,2.2,0.18,woodMat,1,false);block(wx+1.3,0,wz,0.18,2.2,0.18,woodMat,1,false);block(wx,2.1,wz,2.8,0.16,0.16,woodMat,1,false);
+  colliders.push({x:wx,z:wz,r:1.35});
+}
+
+/* ---------- al-Baqi' al-Gharqad ---------- */
+const BQ={x:135,z:30};
+{
+  const n=150,stones=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),stoneMat,n);const d=new THREE.Object3D();let k=0;
+  for(let r=0;r<10&&k<n;r++)for(let c=0;c<15&&k<n;c++){const x=BQ.x-18+c*2.5+R(-0.4,0.4),z=BQ.z-14+r*2.9+R(-0.3,0.3);if(Math.hypot(x-BQ.x,z-BQ.z)>24)continue;
+    d.position.set(x,0.18,z);d.rotation.set(0,R(-0.1,0.1),0);d.scale.set(R(0.6,0.9),R(0.25,0.4),R(1.6,2.0));d.updateMatrix();stones.setMatrixAt(k++,d.matrix);}
+  stones.count=k;stones.receiveShadow=SHADOWS;stones.frustumCulled=false;scene.add(stones);
+  const bn=90,bush=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1,1),L({color:0x77804f}),bn);
+  for(let i=0;i<bn;i++){const a=rnd()*Math.PI*2,rr=R(4,34);d.position.set(BQ.x+Math.cos(a)*rr,R(0.4,0.8),BQ.z+Math.sin(a)*rr);d.rotation.set(rnd(),rnd(),rnd());const s=R(0.8,1.6);d.scale.set(s,s*0.75,s);d.updateMatrix();bush.setMatrixAt(i,d.matrix);
+    bush.setColorAt(i,new THREE.Color().setHSL(0.17+R(-0.03,0.03),0.22,R(0.36,0.46)));colliders.push({x:d.position.x,z:d.position.z,r:s*0.8});}
+  bush.castShadow=SHADOWS;bush.frustumCulled=false;scene.add(bush);
+}
+
+/* ---------- the Trench (Khandaq) ---------- */
+const KH={z:-260,x0:-210,x1:210};
+{
+  flat(KH.x1-KH.x0,8,new THREE.MeshLambertMaterial({color:0x5c4329,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),0,KH.z,0.03);
+  const mound=new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.4,KH.x1-KH.x0,8,1),L({map:sandTex}));mound.rotation.z=Math.PI/2;mound.scale.set(1,1,0.55);mound.position.set(0,0.1,KH.z+6);scene.add(mound);
+}
+
+/* ---------- mountains ---------- */
+function mountain(x,y,z,sx,sy,sz,color,seedOff){const g=new THREE.IcosahedronGeometry(1,4),p=g.attributes.position,v=new THREE.Vector3();
+  for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);const n=1+0.32*(vnoise(v.x*2.5+seedOff,v.z*2.5+v.y)-0.5)+0.12*(vnoise(v.x*7+seedOff,v.y*7)-0.5);v.multiplyScalar(n);p.setXYZ(i,v.x,v.y,v.z);}
+  g.computeVertexNormals();const m=new THREE.Mesh(g,new THREE.MeshPhongMaterial({color,flatShading:true,shininess:0,specular:0x000000}));m.position.set(x,y,z);m.scale.set(sx,sy,sz);scene.add(m);return m;}
+mountain(0,-30,-1150,640,210,170,0x9a6a50,3);   // Uhud
+mountain(-140,-30,-1020,180,90,90,0x8c604a,9);
+mountain(-130,-12,-330,72,50,58,0x6f5b4b,5);   // Sal'
+colliders.push({x:-130,z:-330,r:66});
+mountain(-90,-40,1300,420,150,140,0x8b6a52,7);   // southern horizon (‘Ayr)
+
+/* ---------- harra rocks ---------- */
+{
+  const n=900,rocks=new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1,0),L({color:0x3e3631}),n),d=new THREE.Object3D();let k=0,tries=0;
+  while(k<n&&tries<20000){tries++;const x=R(-600,600),z=R(-560,560);if(harraF(x,z)<0.55)continue;
+    d.position.set(x,R(-0.2,0.2),z);d.rotation.set(rnd()*3,rnd()*3,rnd()*3);const s=R(0.35,2.0);d.scale.set(s,s*R(0.5,0.9),s);d.updateMatrix();rocks.setMatrixAt(k++,d.matrix);
+    if(s>0.8)colliders.push({x,z,r:s*0.85});}
+  rocks.count=k;rocks.castShadow=rocks.receiveShadow=SHADOWS;rocks.frustumCulled=false;scene.add(rocks);
+}
+
+/* ---------- houses & towers (atam) of the quarters ---------- */
+const houses=[];
+function blocked(x,z,rad){
+  if(Math.abs(x)<44+rad&&Math.abs(z)<44+rad)return true;
+  for(const r of roads)if(segDist(x,z,r[0],r[1],r[2],r[3])<r[4]/2+3+rad)return true;
+  if(Math.hypot(x-MK.x,z-MK.z)<36+rad)return true;
+  if(x>BH.x0-6-rad&&x<BH.x1+6+rad&&z>BH.z0-6-rad&&z<BH.z1+6+rad)return true;
+  if(Math.hypot(x-BQ.x,z-BQ.z)<40+rad)return true;
+  if(Math.hypot(x-70,z-400)<24+rad)return true;
+  if(Math.hypot(x+130,z+330)<82+rad)return true;
+  if(Math.abs(z-KH.z)<16+rad&&x>KH.x0-10&&x<KH.x1+10)return true;
+  if(harraF(x,z)>0.3)return true;
+  if(Math.hypot(x,z)>455)return true;
+  return false;}
+function overlapsHouse(x,z,w,d,m){for(const h of houses)if(Math.abs(x-h.x)<(w+h.w)/2+m&&Math.abs(z-h.z)<(d+h.d)/2+m)return true;return false;}
+const quarters=[[-62,-46],[-70,64],[64,72],[-150,-90],[-160,120],[150,-60],[92,-140],[-42,150],[44,176],[150,150],[-100,-190],[118,250],[-64,262],[30,-150],[-175,40],[-20,330],[160,330],[75,-40]];
+const towers=[];
+quarters.forEach(([qx,qz],qi)=>{
+  if(qi%2===0||qi<6){const tx=qx+R(-6,6),tz=qz+R(-6,6);if(!blocked(tx,tz,4)&&!overlapsHouse(tx,tz,6,6,2)){houses.push({x:tx,z:tz,w:6,d:6,h:R(8,10.5),tower:true});}}
+  for(let i=0;i<22;i++){const x=qx+(rnd()+rnd()+rnd()-1.5)*34,z=qz+(rnd()+rnd()+rnd()-1.5)*34,w=R(5,9),d=R(5,9);
+    if(blocked(x,z,Math.max(w,d)/2))continue;if(overlapsHouse(x,z,w,d,R(1.6,3.5)))continue;houses.push({x,z,w,d,h:R(2.6,3.5)});}
+});
+{
+  const plain=houses.filter(h=>!h.tower);
+  const unit=new THREE.BoxGeometry(1,1,1);unit.translate(0,0.5,0);
+  const body=new THREE.InstancedMesh(unit,plasterMat,plain.length),roofM=new THREE.InstancedMesh(unit,thatchMat,plain.length),doors=new THREE.InstancedMesh(unit,doorMat,plain.length);
+  const d=new THREE.Object3D(),col=new THREE.Color();
+  plain.forEach((h,i)=>{d.rotation.set(0,0,0);d.position.set(h.x,0,h.z);d.scale.set(h.w,h.h,h.d);d.updateMatrix();body.setMatrixAt(i,d.matrix);
+    col.setHSL(0.08+R(-0.015,0.02),R(0.32,0.45),R(0.56,0.68));body.setColorAt(i,col);
+    d.position.set(h.x,h.h,h.z);d.scale.set(h.w+0.35,0.16,h.d+0.35);d.updateMatrix();roofM.setMatrixAt(i,d.matrix);
+    const side=(rnd()*4)|0;
+    if(side<2){d.position.set(h.x+R(-h.w/4,h.w/4),0,h.z+(side?1:-1)*(h.d/2+0.03));d.scale.set(0.95,1.85,0.08);}
+    else{d.position.set(h.x+(side===2?1:-1)*(h.w/2+0.03),0,h.z+R(-h.d/4,h.d/4));d.scale.set(0.08,1.85,0.95);}
+    d.updateMatrix();doors.setMatrixAt(i,d.matrix);
+    colliders.push({x0:h.x-h.w/2,x1:h.x+h.w/2,z0:h.z-h.d/2,z1:h.z+h.d/2});});
+  [body,roofM,doors].forEach(m=>{m.castShadow=m.receiveShadow=SHADOWS;m.frustumCulled=false;scene.add(m);});
+  houses.filter(h=>h.tower).forEach(h=>{block(h.x,0,h.z,h.w,h.h,h.d,stoneMat,1.4);
+    for(const [ox,oz,w,dd] of [[0,-h.d/2+0.2,h.w,0.4],[0,h.d/2-0.2,h.w,0.4],[-h.w/2+0.2,0,0.4,h.d],[h.w/2-0.2,0,0.4,h.d]])block(h.x+ox,h.h,h.z+oz,w,0.8,dd,stoneMat,1.4,false);
+    block(h.x,0,h.z+h.d/2+0.04,0.9,1.9,0.08,doorMat,1,false);});
+}
+
+/* ---------- palm groves ---------- */
+function crownGeo(){const pos=[],uv=[],idx=[];const F=11,S=7;let vi=0;
+  for(let f=0;f<F;f++){const ang=f/F*Math.PI*2+(f%2)*0.28;const lift=[0.9,0.35,-0.1][f%3];const Lf=3.0+(f%2)*0.7;const dx=Math.cos(ang),dz=Math.sin(ang);
+    for(let s=0;s<=S;s++){const t=s/S,r=t*Lf;const y=lift*t*1.6-t*t*(1.4+0.4*(f%2));const w=0.6*Math.sin(Math.PI*Math.min(1,t*1.05+0.06))+0.04;
+      const cx=dx*r,cz=dz*r,px=-dz*w,pz=dx*w;pos.push(cx+px,y,cz+pz,cx-px,y,cz-pz);uv.push(0,t,1,t);
+      if(s<S){const a=vi+s*2;idx.push(a,a+1,a+2,a+1,a+3,a+2);}}
+    vi+=(S+1)*2;}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();return g;}
+const palms=[];
+function palmOK(x,z){for(const h of houses)if(Math.abs(x-h.x)<h.w/2+1.4&&Math.abs(z-h.z)<h.d/2+1.4)return false;return true;}
+// garden of Bi'r Ha
+for(let i=0;i<40&&palms.length<40;i++){const x=R(BH.x0+3,BH.x1-3),z=R(BH.z0+3,BH.z1-3);if(Math.hypot(x-34,z+64)<4)continue;palms.push([x,z]);}
+// around Quba
+for(let i=0;i<70;i++){const a=rnd()*Math.PI*2,rr=R(16,60);const x=70+Math.cos(a)*rr,z=400+Math.sin(a)*rr;if(Math.hypot(x,z)>458)continue;
+  let bad=false;for(const r of roads)if(segDist(x,z,r[0],r[1],r[2],r[3])<5)bad=true;if(!bad&&palmOK(x,z))palms.push([x,z]);}
+// oasis gardens
+{let tries=0;while(palms.length<1150&&tries<40000){tries++;const x=R(-440,440),z=R(-440,440);
+  const dens=vnoise(x*0.016+7,z*0.016-3)+(z>60?0.12:0)+(Math.abs(z+120)<70?0.08:0);if(dens<0.5)continue;
+  if(blocked(x,z,0.5))continue;if(!palmOK(x,z))continue;palms.push([x,z]);}}
+{
+  const tg=new THREE.CylinderGeometry(0.15,0.24,1,7);tg.translate(0,0.5,0);{const uv=tg.attributes.uv;for(let i=0;i<uv.count;i++)uv.setY(i,uv.getY(i)*7);}
+  const trunks=new THREE.InstancedMesh(tg,trunkMat,palms.length),crowns=new THREE.InstancedMesh(crownGeo(),frondMat,palms.length);
+  const d=new THREE.Object3D(),v=new THREE.Vector3(),col=new THREE.Color();
+  palms.forEach(([x,z],i)=>{const h=R(5.5,11.5),tilt=R(0,0.13),td=R(0,Math.PI*2);
+    d.position.set(x,0,z);d.rotation.set(Math.cos(td)*tilt,0,Math.sin(td)*tilt);d.scale.set(1,h,1);d.updateMatrix();trunks.setMatrixAt(i,d.matrix);
+    v.set(0,1,0).applyMatrix4(d.matrix);d.position.copy(v);d.rotation.set(Math.cos(td)*tilt,R(0,6.28),Math.sin(td)*tilt);const cs=R(0.85,1.25);d.scale.set(cs,cs,cs);d.updateMatrix();crowns.setMatrixAt(i,d.matrix);
+    col.setHSL(0.24+R(-0.03,0.03),R(0.35,0.5),R(0.42,0.58));crowns.setColorAt(i,col);colliders.push({x,z,r:0.3});});
+  trunks.castShadow=crowns.castShadow=SHADOWS;trunks.receiveShadow=SHADOWS;trunks.frustumCulled=crowns.frustumCulled=false;scene.add(trunks);scene.add(crowns);
+}
+
+/* ---------- landmarks & texts ---------- */
+const LM=[
+ {id:'minbar',x:-4.2,z:15.6,r:3,s:[-4.2,11.8,-4.2,17],cat:'Внутри мечети',title:'Минбар',
+  lead:'Минбар сделан из тамариска (асль) из рощи аль-Габа: две ступени и сиденье. Он стоял у стены киблы, к западу от места, где молился Пророк ﷺ.',
+  more:['До минбара Пророк ﷺ произносил проповедь, стоя у ствола пальмы. Когда он перешёл на минбар, ствол застонал, пока Пророк ﷺ не подошёл к нему, — известный хадис о «тоскующем стволе» у аль-Бухари.','Сахля ибн Са‘да спросили, из чего был минбар; он ответил, что из тамариска аль-Габы, и что его сделал вольноотпущенник одной женщины.'],
+  q:'هُوَ مِنْ أَثْلِ الغابَةِ',src:'Сахль ибн Са‘д; аз-Зейдани, «аль-Мафатих фи шарх аль-Масабих» 2/232 (хадис есть у аль-Бухари)'},
+ {id:'rawda',x:6,z:14.6,r:4.6,s:[5,10.5,5,17],cat:'Внутри мечети',title:'Ар-Рауда',
+  lead:'Пространство между домом Пророка ﷺ (комнатой Аиши) и минбаром. Здесь оно подсвечено зелёным, чтобы его было видно: пол тогда был из песка и гальки.',
+  more:['Пророк ﷺ назвал этот участок садом из садов Рая. В других версиях хадиса добавлено, что его минбар стоит над его водоёмом (хауд).'],
+  q:'مَا بَيْنَ بَيْتِي وَمِنْبَرِي رَوْضَةٌ مِنْ رِيَاضِ الْجَنَّةِ',src:'аль-Байхаки, «ас-Сунан аль-кубра» 10/511; Ибн Абд аль-Барр, «ат-Такасси» 1/53'},
+ {id:'aisha',x:13.6,z:15,r:2.4,s:[10.5,15,16,15],cat:'Дома Пророка ﷺ',title:'Комната Аиши',
+  lead:'Дверь этой комнаты открывалась прямо в мечеть, у Рауды. Здесь Пророк ﷺ скончался и был похоронен; позже рядом похоронили Абу Бакра и Умара.',
+  more:['Комнаты не были частью мечети, но их двери выходили в неё. Внутрь войти нельзя: это дом Пророка ﷺ.','Имам Малик передаёт, что в пятницу, когда мечеть не вмещала всех, люди молились и в комнатах.'],
+  q:'وَكَانَتْ أَبْوَابُهَا شَارِعَةً فِي الْمَسْجِدِ',src:'Ибн ан-Наджжар, «ад-Дурра ас-самина фи ахбар аль-Мадина», с. 248'},
+ {id:'hujurat',x:16.5,z:-5,r:6.5,s:[11,-5,16,-5],cat:'Дома Пророка ﷺ',title:'Комнаты матерей правоверных',
+  lead:'Девять жилищ жён Пророка ﷺ стояли вокруг мечети: с востока, со стороны киблы и с севера, но не с запада.',
+  more:['Четыре дома были из сырцового кирпича, с двориками, огороженными пальмовыми ветвями. Пять — из ветвей, обмазанных глиной, без двориков. На дверях висели занавеси из чёрной шерсти: Имран ибн Абу Анас измерил одну — около трёх локтей на один.','Когда при аль-Валиде их снесли, сыновья сподвижников плакали. Абу Умама сказал: лучше бы их оставили, чтобы люди меньше строили и видели, чем Аллах был доволен для Своего Пророка ﷺ.'],
+  q:'أَرْبَعَةُ أَبْيَاتٍ بِلَبِنٍ لَهَا حُجَرٌ مِنْ جَرِيدٍ',src:'Ибн Са‘д, «ат-Табакат аль-кубра» 1/500; Ибн ан-Наджжар, «ад-Дурра ас-самина», с. 248'},
+ {id:'zulla',x:-9,z:13,r:4.8,s:[-9,8.5,-9,17],cat:'Внутри мечети',title:'Навес у стены киблы',
+  lead:'Крытая часть у киблы: колонны из стволов пальм, кровля из пальмовых ветвей. Кибла здесь на юг, к Каабе.',
+  more:['При постройке пальмы, росшие на участке, срубили и поставили стволы рядом в сторону киблы, а косяки дверей сделали из камня. Пророк ﷺ сам носил кирпичи вместе со сподвижниками.','Сначала кибла мечети была на север, к Байт аль-Макдис. Примерно через 16–17 месяцев после хиджры её повернули к Каабе, и место молитвы перешло к южной стене.','Нижняя часть стен в модели каменная, выше — сырцовый кирпич.'],
+  q:'فَصَفُّوا النَّخْلَ قِبْلَةً لَهُ، وَجَعَلُوا عِضَادَتَيْهِ حِجَارَةً',src:'Ибн ан-Наджжар, «ад-Дурра ас-самина», с. 233; хадис Анаса у аль-Бухари и аль-Байхаки'},
+ {id:'suffa',x:-8,z:-14.8,r:4.6,s:[-8,-9,-8,-17],cat:'Внутри мечети',title:'Ас-Суффа',
+  lead:'Навес в задней, северной части мечети. Здесь жили бедные мухаджиры без семьи и дома — «люди Суффы», среди них Абу Хурайра.',
+  more:['Они учились у Пророка ﷺ, а кормились тем, что им приносили. Пророк ﷺ отправлял к ним еду из того, что дарили ему самому.'],
+  q:'فِي مُؤَخَّرِ الْمَسْجِدِ فِي الصُّفَّةِ',src:'ат-Табари, «Тарих» 4/232 — Суффа в задней части мечети (сообщение о временах после Пророка ﷺ)'},
+ {id:'rahma',x:-15,z:3.1,r:3.2,s:[-21,3.1,-15,3.1],cat:'Ворота мечети',title:'Ворота милости (Баб ар-Рахма)',
+  lead:'Западные ворота. Позже их называли воротами Атики — по дому напротив. Отсюда дорога на рынок.',
+  more:['У мечети было три входа: этот, восточный, через который входил Пророк ﷺ, и задний, северный.'],
+  q:'وَبَابُ عَاتِكَةَ، وَهُوَ بَابُ الرَّحْمَةِ',src:'Ибн ан-Наджжар, «ад-Дурра ас-самина», с. 233 (что ворота в западной стене — примечание мухаккика)'},
+ {id:'uthman',x:15,z:2.3,r:3,s:[21,2.3,15,2.3],cat:'Ворота мечети',title:'Ворота Усмана (Баб Джибриль)',
+  lead:'Восточные ворота, рядом с комнатами жён. Через них входил в мечеть сам Пророк ﷺ.',
+  q:'وَالْبَابُ الَّذِي كَانَ يَدْخُلُ مِنْهُ النَّبِيُّ ﷺ',src:'Ибн ан-Наджжар, «ад-Дурра ас-самина», с. 233'},
+ {id:'rear',x:0,z:-17.5,r:3.2,s:[0,-23,0,-17],cat:'Ворота мечети',title:'Задние ворота',
+  lead:'Северные ворота. Когда киблу повернули к Каабе, вход с южной стороны закрыли, и главным стал вход в задней стене.',
+  q:'بَابًا فِي مُؤَخَّرِهِ',src:'Ибн Са‘д, «ат-Табакат аль-кубра» 1/240'},
+ {id:'mosque',x:0,z:0,r:21,s:[0,1,0,17],cat:'Сердце Медины',title:'Мечеть Пророка ﷺ',
+  lead:'Построена в 1 г. х. на участке Бану ан-Наджжар, где были пальмы, развалины и старые могилы многобожников. Размер — около 70 на 60 локтей (≈ 35 × 30 м).',
+  more:['Пророк ﷺ носил кирпичи вместе со сподвижниками и говорил: «Эта ноша — не ноша Хайбара; она благочестивее, Господь наш, и чище». Сподвижники отвечали: «О Аллах, нет блага, кроме блага последней жизни, помоги же ансарам и мухаджирам».','После Хайбара (7 г. х.) мечеть расширили примерно до 100 на 100 локтей. Модель показывает её до этого расширения.'],
+  q:'بَنَى رَسُولُ اللَّهِ ﷺ مَسْجِدَهُ سَبْعِينَ ذِرَاعًا فِي سِتِّينَ ذِرَاعًا',src:'Хариджа ибн Зейд; ан-Навави, «аль-Маджму‘» 8/277; Ибн аль-Джаузи, «Мусир аль-гарам», с. 463. О расширении — «аль-Манхаль аль-‘азб» 4/58'},
+ {id:'market',x:MK.x,z:MK.z,r:32,s:[-92,14,MK.x,MK.z],cat:'Город',title:'Рынок Медины',
+  lead:'Пророк ﷺ сам выбрал место для рынка мусульман к западу от мечети и установил, что торговцев на нём не облагают налогом.',
+  more:['Ас-Самхуди приводит от Ибн Шаббы: Пророк ﷺ поставил шатёр на месте, которое потом называли Баки‘ аз-Зубайр, и сказал: «Это ваш рынок».','До этого он осмотрел рынок у набатейцев и сказал, что это не рынок для мусульман. Здесь торговали финиками, ячменём, тканями и скотом.'],
+  q:'هَذَا سُوقُكُمْ، فَلَا يُنْتَقَصُ، وَلَا يُضْرَبُ عَلَيْهِ خَرَاجٌ',src:'хадис Абу Усайда ас-Са‘иди; аль-Миззи, «Тахзиб аль-Кямаль» 20/369; ас-Самхуди, «Вафа аль-вафа» 2/257'},
+ {id:'birha',x:30,z:-70,r:24,s:[30,-46,30,-64],cat:'Сады',title:'Сад Бир Ха',
+  lead:'Любимый сад Абу Тальхи, самого богатого пальмами из ансаров. Он был напротив мечети; Пророк ﷺ заходил туда и пил его хорошую воду.',
+  more:['Когда был ниспослан аят «Вы не достигнете благочестия, пока не будете расходовать из того, что любите», Абу Тальха отдал этот сад как садаку, и Пророк ﷺ велел разделить его между родственниками.'],
+  q:'وَكَانَتْ مُسْتَقْبِلَةَ الْمَسْجِدِ',src:'хадис Анаса; Ибн Абд аль-Барр, «ат-Тамхид» 1/402'},
+ {id:'baqi',x:BQ.x,z:BQ.z,r:36,s:[108,28,BQ.x,BQ.z],cat:'Город',title:'Аль-Баки‘ аль-Гаркад',
+  lead:'Кладбище к востоку от мечети, названное по колючим кустам гаркад. Здесь похоронены многие сподвижники и члены семьи Пророка ﷺ.',
+  more:['Пророк ﷺ выходил сюда, порой ночью, приветствовал похороненных и просил для них прощения. Первым из мухаджиров здесь похоронили Усмана ибн Маз‘уна.']},
+ {id:'khandaq',line:true,x:0,z:KH.z,x0:KH.x0,x1:KH.x1,r:22,s:[6,-238,6,-262],cat:'Битвы',title:'Хандак — ров (5 г. х.)',
+  lead:'Ров вырыли с северной стороны, где город был открыт, между двумя лавовыми полями. С других сторон Медину прикрывали харры, сады и постройки.',
+  more:['Ров копали по совету Сальмана аль-Фариси, и Пророк ﷺ работал вместе со всеми. Осада союзных племён длилась около месяца и закончилась без большого сражения. В модели ров показан как след вдоль северной дороги.']},
+ {id:'sal',x:-130,z:-330,r:84,s:[-80,-262,-130,-330],cat:'Горы',title:'Гора Саль‘',
+  lead:'Невысокая гора к северо-западу от мечети. Во время битвы у рва войско стояло у её склона, спиной к горе, а ров был перед ним.'},
+ {id:'uhud',x:0,z:-1150,r:780,s:[4,-425,0,-1150],cat:'Горы',title:'Гора Ухуд',
+  lead:'Большая красноватая гора к северу от Медины. Пророк ﷺ сказал: «Ухуд — гора, которая любит нас, и мы любим её».',
+  more:['У её подножия в 3 г. х. была битва Ухуд, где пали Хамза ибн Абд аль-Мутталиб и другие шахиды. В модели гора на горизонте, дойти до неё нельзя.']},
+ {id:'quba',x:70,z:400,r:34,s:[70,382,70,400],cat:'Мечети',title:'Мечеть Куба',
+  lead:'Первая мечеть, построенная Пророком ﷺ по прибытии, в селении Куба к югу от Медины.',
+  more:['Пророк ﷺ приходил сюда по субботам, пешком или верхом, и молился два раката. В действительности до Кубы около трёх с половиной километров; в модели расстояние сжато.']},
+ {id:'harraE',x:330,z:20,r:125,s:[205,20,330,20],cat:'Природа',title:'Восточная харра (Харрат Ваким)',
+  lead:'Поле чёрного базальта, застывшей лавы. Харры с востока и запада защищали город: по ним трудно пройти войску и коннице.'},
+ {id:'harraW',x:-330,z:20,r:125,s:[-205,20,-330,20],cat:'Природа',title:'Западная харра (Харрат аль-Вабра)',
+  lead:'Лавовое поле к западу от города. Между двумя харрами лежал оазис Ясриба с садами, колодцами и кварталами племён.'},
+ {id:'city',x:0,z:0,r:1e9,s:[-28,3.1,0,3.1],cat:'Ясриб — Медина',title:'Медина',
+  lead:'Оазис между двумя лавовыми полями: пальмовые сады, колодцы и кварталы племён аус, хазрадж и других, с каменными башнями-крепостями (атам).',
+  more:['Пророк ﷺ прибыл сюда в месяце раби‘ аль-авваль 1 г. х., и город стал называться Мединат ан-Наби — городом Пророка ﷺ.','Расстояния между местами в модели сжаты, чтобы всё можно было обойти пешком. Людей в модели нет: Пророка ﷺ и сподвижников не изображают.']}
+];
+const LMbyId={};LM.forEach(l=>LMbyId[l.id]=l);
+function lmDist(l,x,z){return l.line?segDist(x,z,l.x0,l.z,l.x1,l.z):Math.hypot(x-l.x,z-l.z);}
+const sortedLM=LM.slice().sort((a,b)=>a.r-b.r);
+function landmarkAt(x,z){for(const l of sortedLM)if(lmDist(l,x,z)<l.r)return l;return LMbyId.city;}
+
+/* ---------- floating labels ---------- */
+const labels=[];
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.lineTo(x+w-r,y);g.quadraticCurveTo(x+w,y,x+w,y+r);g.lineTo(x+w,y+h-r);g.quadraticCurveTo(x+w,y+h,x+w-r,y+h);g.lineTo(x+r,y+h);g.quadraticCurveTo(x,y+h,x,y+h-r);g.lineTo(x,y+r);g.quadraticCurveTo(x,y,x+r,y);g.closePath();}
+function buildLabels(){
+  const defs=[['mosque','Мечеть Пророка ﷺ',0,13,0],['market','Рынок',MK.x,11,MK.z],['birha','Сад Бир Ха',30,14,-70],['baqi','Аль-Баки‘',BQ.x,9,BQ.z],
+    ['khandaq','Хандак',0,8,KH.z],['sal','Саль‘',-130,62,-330],['uhud','Ухуд',0,250,-1150],['quba','Мечеть Куба',70,12,400]];
+  defs.forEach(([id,text,x,y,z])=>{const c=document.createElement('canvas'),g=c.getContext('2d'),fs=46,font=`700 ${fs}px "Alegreya Sans", "Segoe UI", sans-serif`;
+    g.font=font;const w=Math.ceil(g.measureText(text).width)+52;c.width=w;c.height=80;g.font=font;
+    g.fillStyle='rgba(30,25,19,.8)';rr(g,2,2,w-4,76,38);g.fill();g.fillStyle='#f3ead8';g.textBaseline='middle';g.fillText(text,26,43);
+    const t=new THREE.CanvasTexture(c);t.minFilter=THREE.LinearFilter;
+    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,fog:false,depthWrite:false,transparent:true}));s.position.set(x,y,z);s.userData={id,aspect:w/80};s.renderOrder=5;scene.add(s);labels.push(s);});
+}
+const fontWait=new Promise(res=>{setTimeout(res,2500);if(document.fonts&&document.fonts.load)Promise.all([document.fonts.load('700 46px "Alegreya Sans"')]).then(res,res);});
+fontWait.then(buildLabels);
+
+/* ---------- player & input ---------- */
+const P={x:-28,z:3.1,yaw:-Math.PI/2,pitch:-0.02};
+const PR=0.32,EYE=1.62;
+const keys=new Set();
+addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('input,textarea'))return;keys.add(e.code);if(e.code.startsWith('Arrow')||e.code==='Space')e.preventDefault();});
+addEventListener('keyup',e=>keys.delete(e.code));
+addEventListener('blur',()=>keys.clear());
+
+const joyEl=$('#joy'),knob=$('#knob');
+const joy={id:null,ox:0,oy:0,vx:0,vy:0};const look={id:null,lx:0,ly:0};
+canvas.addEventListener('pointerdown',e=>{canvas.focus({preventScroll:true});
+  if(e.pointerType==='mouse'){look.id=e.pointerId;look.lx=e.clientX;look.ly=e.clientY;canvas.setPointerCapture(e.pointerId);return;}
+  if(e.clientX<innerWidth*0.45&&joy.id===null){joy.id=e.pointerId;joy.ox=e.clientX;joy.oy=e.clientY;joy.vx=joy.vy=0;joyEl.style.left=e.clientX+'px';joyEl.style.top=e.clientY+'px';knob.style.transform='';joyEl.hidden=false;}
+  else if(look.id===null){look.id=e.pointerId;look.lx=e.clientX;look.ly=e.clientY;}
+  try{canvas.setPointerCapture(e.pointerId);}catch(_){}
+  hideHint();});
+canvas.addEventListener('pointermove',e=>{
+  if(e.pointerId===joy.id){let dx=e.clientX-joy.ox,dy=e.clientY-joy.oy;const m=Math.hypot(dx,dy),mx=52;if(m>mx){dx*=mx/m;dy*=mx/m;}joy.vx=dx/mx;joy.vy=dy/mx;knob.style.transform=`translate(${dx}px,${dy}px)`;}
+  else if(e.pointerId===look.id){const k=e.pointerType==='mouse'?0.0032:0.0052;P.yaw-=(e.clientX-look.lx)*k;P.pitch-=(e.clientY-look.ly)*k;P.pitch=Math.max(-1.2,Math.min(1.2,P.pitch));look.lx=e.clientX;look.ly=e.clientY;}});
+function endPtr(e){if(e.pointerId===joy.id){joy.id=null;joy.vx=joy.vy=0;joyEl.hidden=true;}if(e.pointerId===look.id)look.id=null;}
+canvas.addEventListener('pointerup',endPtr);canvas.addEventListener('pointercancel',endPtr);canvas.addEventListener('lostpointercapture',endPtr);
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
+
+function collide(){for(let pass=0;pass<2;pass++)for(const c of colliders){
+  if(c.r!==undefined){const dx=P.x-c.x,dz=P.z-c.z,rr2=c.r+PR;if(Math.abs(dx)>rr2||Math.abs(dz)>rr2)continue;const d2=dx*dx+dz*dz;if(d2<rr2*rr2){const d=Math.sqrt(d2)||1e-4;P.x=c.x+dx/d*rr2;P.z=c.z+dz/d*rr2;}}
+  else{if(P.x<c.x0-PR||P.x>c.x1+PR||P.z<c.z0-PR||P.z>c.z1+PR)continue;const cx=Math.max(c.x0,Math.min(P.x,c.x1)),cz=Math.max(c.z0,Math.min(P.z,c.z1));const dx=P.x-cx,dz=P.z-cz,d2=dx*dx+dz*dz;
+    if(d2>1e-8){if(d2<PR*PR){const d=Math.sqrt(d2);P.x=cx+dx/d*PR;P.z=cz+dz/d*PR;}}
+    else{const l=P.x-c.x0,r=c.x1-P.x,b=P.z-c.z0,t=c.z1-P.z,m=Math.min(l,r,b,t);if(m===l)P.x=c.x0-PR;else if(m===r)P.x=c.x1+PR;else if(m===b)P.z=c.z0-PR;else P.z=c.z1+PR;}}}
+  const d=Math.hypot(P.x,P.z),B=462;if(d>B){P.x*=B/d;P.z*=B/d;}}
+
+let bobT=0;
+function move(dt){let f=0,s=0,run=keys.has('ShiftLeft')||keys.has('ShiftRight');
+  if(keys.has('KeyW')||keys.has('ArrowUp'))f+=1;if(keys.has('KeyS')||keys.has('ArrowDown'))f-=1;if(keys.has('KeyD'))s+=1;if(keys.has('KeyA'))s-=1;
+  if(keys.has('ArrowLeft'))P.yaw+=1.9*dt;if(keys.has('ArrowRight'))P.yaw-=1.9*dt;
+  if(joy.id!==null){f+=-joy.vy;s+=joy.vx;if(Math.hypot(joy.vx,joy.vy)>0.92)run=true;}
+  const m=Math.hypot(f,s);if(m>1){f/=m;s/=m;}
+  const sp=(run?8:3.8)*dt;const sy=Math.sin(P.yaw),cy=Math.cos(P.yaw);
+  P.x+=(-sy*f+cy*s)*sp;P.z+=(-cy*f-sy*s)*sp;
+  if(m>0.05){bobT+=dt*(run?11:7.5)*Math.min(1,m);collide();}
+}
+
+/* ---------- UI: card, places, minimap ---------- */
+const card=$('#card'),reopen=$('#reopen');
+let curLM=null,cardClosed=false,expanded=false;
+function fillCard(l){$('#cCat').textContent=l.cat;$('#cTitle').textContent=l.title;$('#cLead').textContent=l.lead;
+  const ps=$('#cParas');ps.textContent='';(l.more||[]).forEach(t=>{const p=document.createElement('p');p.textContent=t;ps.appendChild(p);});
+  const hasQ=!!l.q;$('#cQuote').hidden=!hasQ;if(hasQ){$('#cQ').textContent=l.q;$('#cSrc').textContent=l.src||'';}
+  const hasMore=(l.more&&l.more.length)||hasQ;$('#cToggle').hidden=!hasMore;expanded=false;$('#cMore').hidden=true;$('#cToggle').textContent='Подробнее ▾';card.scrollTop=0;}
+function showCardState(){const introOpen=!$('#intro').hidden||!$('#places').hidden;card.hidden=introOpen||cardClosed;reopen.hidden=introOpen||!cardClosed;}
+$('#cToggle').onclick=()=>{expanded=!expanded;$('#cMore').hidden=!expanded;$('#cToggle').textContent=expanded?'Свернуть ▴':'Подробнее ▾';};
+$('#cClose').onclick=()=>{cardClosed=true;showCardState();};
+reopen.onclick=()=>{cardClosed=false;showCardState();};
+function setLM(l){if(l===curLM)return;curLM=l;$('#placeName').textContent=l.title;fillCard(l);cardClosed=false;showCardState();}
+
+function teleport(l){const [x,z,tx,tz]=l.s;P.x=x;P.z=z;P.yaw=yawTo(x,z,tx,tz);P.pitch=l.id==='uhud'||l.id==='sal'?0.12:-0.04;collide();curLM=null;}
+{
+  const groups={};LM.forEach(l=>{(groups[l.cat]=groups[l.cat]||[]).push(l);});
+  const order=['Сердце Медины','Внутри мечети','Дома Пророка ﷺ','Ворота мечети','Город','Сады','Мечети','Битвы','Горы','Природа','Ясриб — Медина'];
+  const body=$('#pBody');
+  order.forEach(cat=>{if(!groups[cat])return;const h=document.createElement('div');h.className='pgroup';h.textContent=cat;body.appendChild(h);
+    const list=document.createElement('div');list.className='plist';
+    groups[cat].forEach(l=>{const b=document.createElement('button');b.className='pitem';b.textContent=l.id==='city'?'Вход в город (начало)':l.title;b.dataset.id=l.id;
+      b.onclick=()=>{teleport(l);closePlaces();};list.appendChild(b);});body.appendChild(list);});
+}
+function openPlaces(){document.querySelectorAll('.pitem').forEach(b=>b.classList.toggle('on',curLM&&b.dataset.id===curLM.id));$('#places').hidden=false;showCardState();}
+function closePlaces(){$('#places').hidden=true;showCardState();canvas.focus({preventScroll:true});}
+$('#btnPlaces').onclick=openPlaces;$('#pClose').onclick=closePlaces;
+$('#places').addEventListener('click',e=>{if(e.target.id==='places')closePlaces();});
+$('#btnInfo').onclick=()=>{$('#intro').hidden=false;$('#go').textContent='Продолжить';showCardState();};
+addEventListener('keydown',e=>{if(e.code==='Escape'){if(!$('#places').hidden)closePlaces();}});
+
+const hint=$('#hint');let hintTimer=null;
+function showHint(t){hint.textContent=t;hint.hidden=false;hint.style.opacity='1';clearTimeout(hintTimer);hintTimer=setTimeout(hideHint,6000);}
+function hideHint(){if(hint.hidden)return;hint.style.opacity='0';setTimeout(()=>{hint.hidden=true;},600);}
+
+let started=false;
+$('#go').onclick=()=>{$('#intro').hidden=true;
+  if(!started){started=true;P.x=-28;P.z=3.1;P.yaw=-Math.PI/2;P.pitch=-0.02;curLM=null;
+    showHint(isTouch?'Левой половиной экрана — идти, правой — смотреть':'W A S D — идти, мышь с зажатой кнопкой — смотреть');}
+  showCardState();canvas.focus({preventScroll:true});};
+
+const mini=$('#mini'),mg=mini.getContext('2d');let miniFar=false;
+mini.addEventListener('click',()=>{miniFar=!miniFar;$('#miniHint').textContent=miniFar?'весь город · нажмите':'рядом · нажмите';});
+const miniCol={'Внутри мечети':'#9cc066','Дома Пророка ﷺ':'#d39a52','Ворота мечети':'#f3ead8','Город':'#e7c27a','Сады':'#9cc066','Мечети':'#f3ead8','Битвы':'#d46a4c','Горы':'#b9805f','Природа':'#8d8178','Сердце Медины':'#f3ead8'};
+function drawMini(){const S=mini.width,c=S/2,Rw=miniFar?470:62,k=c/Rw;
+  const W=(x,z)=>[c+(x-P.x)*k,c+(z-P.z)*k];
+  mg.save();mg.clearRect(0,0,S,S);mg.beginPath();mg.arc(c,c,c-1,0,Math.PI*2);mg.clip();
+  mg.fillStyle='#cdb385';mg.fillRect(0,0,S,S);
+  mg.fillStyle='rgba(55,48,42,.85)';{const a=W(215,-600),b=W(800,600);mg.fillRect(a[0],a[1],b[0]-a[0],b[1]-a[1]);const a2=W(-800,-600),b2=W(-215,600);mg.fillRect(a2[0],a2[1],b2[0]-a2[0],b2[1]-a2[1]);}
+  mg.strokeStyle='#ead8b2';mg.lineCap='round';roads.forEach(r=>{mg.lineWidth=Math.max(2,r[4]*k);const a=W(r[0],r[1]),b=W(r[2],r[3]);mg.beginPath();mg.moveTo(a[0],a[1]);mg.lineTo(b[0],b[1]);mg.stroke();});
+  {const a=W(KH.x0,KH.z),b=W(KH.x1,KH.z);mg.strokeStyle='#6b4b2c';mg.lineWidth=Math.max(2,8*k);mg.beginPath();mg.moveTo(a[0],a[1]);mg.lineTo(b[0],b[1]);mg.stroke();}
+  mg.fillStyle='#a77d52';houses.forEach(h=>{const a=W(h.x-h.w/2,h.z-h.d/2);const w=Math.max(1.5,h.w*k),d=Math.max(1.5,h.d*k);if(a[0]>-10&&a[0]<S+10&&a[1]>-10&&a[1]<S+10)mg.fillRect(a[0],a[1],w,d);});
+  if(miniFar){mg.fillStyle='rgba(98,128,62,.55)';palms.forEach(([x,z],i)=>{if(i%2)return;const a=W(x,z);mg.fillRect(a[0]-1,a[1]-1,2,2);});}
+  else{mg.fillStyle='rgba(88,120,52,.8)';palms.forEach(([x,z])=>{const a=W(x,z);if(a[0]>-5&&a[0]<S+5&&a[1]>-5&&a[1]<S+5){mg.beginPath();mg.arc(a[0],a[1],Math.max(2,1.6*k),0,7);mg.fill();}});}
+  {const a=W(-MX,-MZ);mg.fillStyle='#e9dcc0';mg.fillRect(a[0],a[1],2*MX*k,2*MZ*k);mg.strokeStyle='#8a5d36';mg.lineWidth=Math.max(1.5,0.7*k);mg.strokeRect(a[0],a[1],2*MX*k,2*MZ*k);
+    mg.fillStyle='#b9834e';eastRooms.forEach(r=>{const b=W(MX+0.35,r.z-r.len/2);mg.fillRect(b[0],b[1],4.4*k,r.len*k);});southRooms.forEach(r=>{const b=W(r.x-2.2,MZ+0.35);mg.fillRect(b[0],b[1],4.4*k,4.2*k);});
+    const b=W(neRoom.x-2.2,-MZ-4.55);mg.fillRect(b[0],b[1],4.4*k,4.2*k);
+    if(!miniFar){const r=W(-3.6,12);mg.fillStyle='rgba(127,181,90,.45)';mg.fillRect(r[0],r[1],18.2*k,5.1*k);}}
+  LM.forEach(l=>{if(l.id==='city'||l.line)return;if(miniFar&&l.r<10)return;if(!miniFar&&l.r>200)return;const a=W(l.x,l.z);
+    mg.fillStyle=miniCol[l.cat]||'#fff';mg.strokeStyle='rgba(30,25,19,.9)';mg.lineWidth=2;mg.beginPath();mg.arc(a[0],a[1],miniFar?5:6,0,7);mg.fill();mg.stroke();});
+  // player
+  mg.translate(c,c);const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw);mg.rotate(Math.atan2(fz,fx));
+  mg.fillStyle='rgba(243,234,216,.22)';mg.beginPath();mg.moveTo(0,0);mg.arc(0,0,c*0.55,-0.5,0.5);mg.closePath();mg.fill();
+  mg.fillStyle='#1e1913';mg.strokeStyle='#f3ead8';mg.lineWidth=2.5;mg.beginPath();mg.moveTo(13,0);mg.lineTo(-8,-8);mg.lineTo(-4,0);mg.lineTo(-8,8);mg.closePath();mg.fill();mg.stroke();
+  mg.restore();
+  mg.font='700 22px "Alegreya Sans", sans-serif';mg.fillStyle='#1e1913';mg.textAlign='center';mg.fillText('С',c,24);
+}
+
+/* ---------- loop ---------- */
+function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+addEventListener('resize',resize);
+let last=performance.now(),frame=0;
+function tick(now){requestAnimationFrame(tick);const dt=Math.min(0.05,(now-last)/1000);last=now;frame++;
+  const introOpen=!$('#intro').hidden;
+  if(introOpen&&!started){P.yaw+=dt*0.06;}
+  else if($('#places').hidden)move(dt);
+  const bob=Math.sin(bobT)*0.035;
+  camera.position.set(P.x,EYE+bob,P.z);camera.rotation.set(P.pitch,P.yaw,0);
+  sky.position.copy(camera.position);
+  sun.position.set(P.x+SUN.x*150,SUN.y*150,P.z+SUN.z*150);sun.target.position.set(P.x,0,P.z);
+  for(const s of labels){const l=LMbyId[s.userData.id];const d=camera.position.distanceTo(s.position);const near=lmDist(l,P.x,P.z)<Math.min(l.r*0.7,60)&&l.id!=='uhud';
+    s.visible=!near&&(d<900||l.id==='uhud');const h=Math.max(1.4,Math.min(70,d*0.034));s.scale.set(h*s.userData.aspect,h,1);}
+  if(frame%8===0&&(started||!introOpen))setLM(landmarkAt(P.x,P.z));
+  if(frame%2===0)drawMini();
+  renderer.render(scene,camera);}
+showCardState();
+requestAnimationFrame(tick);
+})();
+</script>
