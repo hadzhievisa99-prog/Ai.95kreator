@@ -6,4 +6,4 @@ and converted to JPEG. Higher resolutions (1K–8K) of the same textures are ava
 
 Used: aerial_sand, brown_mud, brown_mud_dry, clay_plaster, dark_rock, dry_ground_01, gravelly_sand, large_sandstone_blocks,
 mud_cracked_dry_03, old_wood_floor, palm_bark, palm_tree_bark, patterned_clay_wall, rock_boulder_dry, rough_plaster_brick,
-rough_wood, sand_01, sandy_gravel, stone_wall, thatch_roof_angled.
+rough_wood, sand_01, sandy_gravel, stone_wall.

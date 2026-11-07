@@ -55,8 +55,8 @@ window.__realism = async function realism(opts) {
 		return set;
 	};
 
-	const [sand, pebbles, path, clay, stone, mud, thatch, wood, bark, basalt, rock] = await Promise.all(
-		['sand_01', 'brown_mud_dry', 'sand_01', 'clay_plaster', 'stone_wall', 'brown_mud', 'thatch_roof_angled', 'rough_wood', 'palm_bark', 'dark_rock', 'rock_boulder_dry'].map(pbr),
+	const [sand, pebbles, path, clay, stone, mud, wood, bark, basalt, rock] = await Promise.all(
+		['sand_01', 'brown_mud_dry', 'sand_01', 'clay_plaster', 'stone_wall', 'brown_mud', 'rough_wood', 'palm_bark', 'dark_rock', 'rock_boulder_dry'].map(pbr),
 	);
 
 	const brick = {...clay, map: composite(clay.map, TX.brickTex, 0.85)};
@@ -82,7 +82,7 @@ window.__realism = async function realism(opts) {
 		[TX.stoneTex, {set: stone, normalScale: 1.4, color: tint(0.72, 0.64, 0.56)}],
 		[TX.plasterTex, {set: plaster, normalScale: 1.0, color: tint(1.05, 0.95, 0.85)}],
 		[TX.frondMudTex, {set: frondMud, normalScale: 1.0, color: tint(1.35, 1.15, 0.95)}],
-		[TX.thatchTex, {set: thatch, normalScale: 1.3, color: tint(2.2, 1.85, 1.35)}],
+		// roofs of palm fronds (jarid): no matching photo texture, so the original drawing is kept
 		[TX.woodTex, {set: wood, normalScale: 1.0, color: tint(0.62, 0.42, 0.27)}],
 		[TX.trunkTex, {set: bark, normalScale: 1.6, color: tint(1.5, 1.2, 0.95)}],
 	]);

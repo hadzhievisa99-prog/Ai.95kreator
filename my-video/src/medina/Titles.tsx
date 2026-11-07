@@ -79,7 +79,7 @@ export const FinaleTitle: React.FC = () => {
 			}}
 		>
 			<div dir="rtl" lang="ar" style={{...reveal(frame, 24, 24), fontFamily: arabic, fontWeight: 700, fontSize: 112, color: '#f8e3b8', lineHeight: 1.3}}>
-				مدينة النبي ﷺ
+				المدينة المنورة
 			</div>
 			<Ornament at={40} />
 			<div style={{...reveal(frame, 50), fontFamily: `${display}, ${arabic}`, fontWeight: 700, fontSize: 76, lineHeight: 1.08, textWrap: 'balance'}}>
