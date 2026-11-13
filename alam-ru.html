@@ -103,9 +103,9 @@ input[type=range]{flex:1;min-width:0;accent-color:var(--gold);height:32px}
     </div>
     <div class="srow">
       <button class="play" id="play" aria-label="Воспроизвести">▶</button>
-      <button class="step" id="m10" aria-label="Минус 10 лет">−10</button>
+      <button class="step" id="m10" aria-label="Минус 1 год">−1</button>
       <input type="range" id="yr" min="1" max="1000" step="1" value="200" aria-label="Год хиджры">
-      <button class="step" id="p10" aria-label="Плюс 10 лет">+10</button>
+      <button class="step" id="p10" aria-label="Плюс 1 год">+1</button>
     </div>
     <div class="chips" id="chips"></div>
   </div>
@@ -586,8 +586,8 @@ function closeSheet(){document.getElementById("sheet").classList.remove("open");
 function setYear(y){st.year=Math.max(1,Math.min(1000,y));render()}
 const slider=document.getElementById("yr");
 slider.addEventListener("input",()=>setYear(+slider.value));
-document.getElementById("m10").onclick=()=>setYear(st.year-10);
-document.getElementById("p10").onclick=()=>setYear(st.year+10);
+document.getElementById("m10").onclick=()=>setYear(st.year-1);
+document.getElementById("p10").onclick=()=>setYear(st.year+1);
 let timer=null;const play=document.getElementById("play");
 function stop(){clearInterval(timer);timer=null;play.textContent="▶";play.setAttribute("aria-label","Воспроизвести")}
 play.onclick=()=>{if(timer){stop();return}if(st.year>=1000)st.year=1;play.textContent="❚❚";play.setAttribute("aria-label","Пауза");timer=setInterval(()=>{if(st.year>=1000){stop();return}setYear(st.year+1)},120)};
